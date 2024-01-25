@@ -2,7 +2,7 @@
  <nav>
     <div class="upperNav">
 
-        <p>nombres d'heures travaillées aujourd'hui: </p>
+        <button @click="toggleTimer">nombres d'heures travaillées aujourd'hui:{{ timerRunning ? 'Arrêter' : 'Démarrer' }}</button>>
         <p>nombres d'objectifs atteints: </p>
         <routerLink to="../views/Activity.vue">Voir les activités</routerLink>
         <routerLink to="../views/Project.vue">Voir les statistiques</routerLink>
@@ -23,7 +23,47 @@
 <script>
 
 export default{
+    data() {
+    return {
+        timerRunning: false,
+        startTime: null,
+        duration: 0,
+        timerInterval: null,
+    };
+    },
+    methods: {
+    startTimer() {
+      this.timerRunning = true;
+      this.startTime = Date.now();
+      this.timerInterval = setInterval(() => {
+        this.duration = Date.now() - this.startTime;
+      }, 1000);
+    },
+    stopTimer() {
+      this.timerRunning = false;
+      clearInterval(this.timerInterval);
+    },
+    resetTimer() {
+      this.timerRunning = false;
+      this.startTime = null;
+      this.duration = 0;
+      clearInterval(this.timerInterval);
+    },
+    formatTime(milliseconds) {
+      const seconds = Math.floor(milliseconds / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
 
+      const formattedTime =
+        String(hours).padStart(2, '0') +
+        ':' +
+        String(minutes % 60).padStart(2, '0') +
+        ':' +
+        String(seconds % 60).padStart(2, '0');
+
+      return formattedTime;
+    }
+}
 }
 </script>
 

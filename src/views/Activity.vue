@@ -1,10 +1,8 @@
 <script>
-import { RouterLink, RouterView } from 'vue-router'
 import Activity from '@/components/Activity.vue'
 
 export default {
   components: {
-    RouterLink,
     Activity
   },
   data() {

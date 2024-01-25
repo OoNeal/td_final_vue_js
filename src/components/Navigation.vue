@@ -1,8 +1,8 @@
 <template>
  <nav>
     <div class="upperNav">
-
-        <button @click="toggleTimer">nombres d'heures travaillées aujourd'hui:{{ timerRunning ? 'Arrêter' : 'Démarrer' }}</button>>
+        <button @click="toggleTimer">nombres d'heures travaillées aujourd'hui:{{ timerRunning ? 'Arrêter' : 'Démarrer' }}</button>
+        <p>{{ formatTime(duration) }}</p>
         <p>nombres d'objectifs atteints: </p>
         <routerLink to="../views/Activity.vue">Voir les activités</routerLink>
         <routerLink to="../views/Project.vue">Voir les statistiques</routerLink>
@@ -32,21 +32,22 @@ export default{
     };
     },
     methods: {
+    toggleTimer() {
+      if (this.timerRunning) {
+        this.stopTimer();
+      } else {
+        this.startTimer();
+      }
+    },
     startTimer() {
       this.timerRunning = true;
       this.startTime = Date.now();
-      this.timerInterval = setInterval(() => {
+      this.timerInterval = setInterval(function () {
         this.duration = Date.now() - this.startTime;
-      }, 1000);
+      }.bind(this), 1000);
     },
     stopTimer() {
       this.timerRunning = false;
-      clearInterval(this.timerInterval);
-    },
-    resetTimer() {
-      this.timerRunning = false;
-      this.startTime = null;
-      this.duration = 0;
       clearInterval(this.timerInterval);
     },
     formatTime(milliseconds) {
@@ -62,9 +63,10 @@ export default{
         String(seconds % 60).padStart(2, '0');
 
       return formattedTime;
-    }
+    },
+  },
 }
-}
+
 </script>
 
 <style scoped>
@@ -106,6 +108,15 @@ nav {
     margin-left: 15px; 
 }
 
+.upperNav button {
+    font-family:'Poppins', sans-serif;
+    background-color: #ffffff; 
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
 
 .bottomNav {
     display: flex;
@@ -125,10 +136,13 @@ nav {
 
 
 .bottomNav button {
-    background-color: #dc3545; 
+    font-family:'Poppins', sans-serif;
+    background-color: #333; 
+    color: #fff;
     border: none;
     padding: 5px;
     cursor: pointer;
+    border-radius: 20px;
 }
 
 

@@ -95,7 +95,7 @@ nav {
 .bottomNav a {
     text-decoration: none;
     color: #333 ;   
-    margin-left: 15px; 
+     margin-left: 15px; 
     font-family:'Poppins',sans-serif;
     font-weight:300;
     font-size:20px;

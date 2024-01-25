@@ -1,9 +1,8 @@
 <template>
  <nav>
     <div class="upperNav">
-        <button @click="toggleTimer">nombres d'heures travaillées aujourd'hui:{{ timerRunning ? 'Arrêter' : 'Démarrer' }}</button>
-        <p>{{ formatTime(duration) }}</p>
-        <p>nombres d'objectifs atteints: </p>
+        <button @click="toggleTimer">Commencer son temps de travail:   {{ formatTime(duration) }}   </button>
+        <p>nombres d'objectifs atteints: {{ displayProject }} </p>
         <routerLink to="../views/Activity.vue">Voir les activités</routerLink>
         <routerLink to="../views/Project.vue">Voir les statistiques</routerLink>
 
@@ -13,7 +12,7 @@
 
         <p>Activités en cours: </p>
         <button type="button" aria-label="stop"><img src="../assets/img/Stop_button.png">Stopper l'activité en cours</button>
-        <routerLink to="../views/Settings.vue">Paramètres globaux</routerLink>
+        <routerLink to="../views/Settings.vue">Paramètres globaux </routerLink>
         <routerLink to="../views/Settings.vue">Voir les statistiques</routerLink>
 
     </div>
@@ -21,6 +20,8 @@
 </template>
 
 <script>
+import api from '../plugins/api.js'
+
 
 export default{
     data() {
@@ -29,6 +30,7 @@ export default{
         startTime: null,
         duration: 0,
         timerInterval: null,
+        project: api.get('/api/projects'),
     };
     },
     methods: {
@@ -64,6 +66,10 @@ export default{
 
       return formattedTime;
     },
+    displayProject() {
+      const pastProject = this.project
+      return pastProject
+    }
   },
 }
 
@@ -112,9 +118,10 @@ nav {
     font-family:'Poppins', sans-serif;
     background-color: #ffffff; 
     border: none;
-    padding: 5px;
+    padding: 10px;
     cursor: pointer;
     border-radius: 20px;
+    text-transform:uppercase;
 }
 
 
@@ -140,9 +147,11 @@ nav {
     background-color: #333; 
     color: #fff;
     border: none;
-    padding: 5px;
+    padding: 10px;
     cursor: pointer;
     border-radius: 20px;
+    text-align:center;
+    vertical-align:middle;
 }
 
 

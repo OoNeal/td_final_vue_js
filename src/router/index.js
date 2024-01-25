@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from "@/views/Home.vue";
-import Activities from "@/views/Activities.vue";
+import Home from '@/views/Home.vue'
+import { getApiKey, setReturnUrl } from '@/stores/Auth.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,9 +11,27 @@ const router = createRouter({
       component: Home,
     },
     {
-      path: '/activities',
-      component : Activities
+      path:'/activite',
+      name:'activite',
+      component:() => import('@/views/Activity.vue')
     },
+    {
+      path: '/auth',
+      name: 'auth',
+      component: () => import('@/views/Auth/AuthView.vue'),
+      children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: () => import('@/views/Auth/LoginView.vue'),
+        },
+        {
+          path: 'register',
+          name: 'register',
+          component: () => import('@/views/Auth/RegisterView.vue'),
+        }
+      ]
+    }
   ]
 });
 

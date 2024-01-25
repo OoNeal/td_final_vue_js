@@ -1,14 +1,17 @@
 <script >
 import {RouterView } from 'vue-router'
+import {Navigation} from '@/components/Navigation.vue'
 
 export default {
   components: {
-    RouterView
+    RouterView,
+    Navigation
   },
 }
 </script>
 
 <template>
+  <Navigation/>
   <RouterView />
 </template>
 

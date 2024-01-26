@@ -11,7 +11,6 @@ export default {
 </script>
 
 <template>
-  <Navigation/>
   <RouterView />
 </template>
 

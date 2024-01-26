@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
-const useAuthStore = defineStore('auth', {
-  state: () => {
+export const useAuthStore = defineStore('auth', {
+  state() {
     return {
       apiKey: null,
       returnUrl: null
@@ -9,27 +9,19 @@ const useAuthStore = defineStore('auth', {
   },
   persist: {
     enabled: true,
-    strategies: [
-      {
-        storage: localStorage, paths: ['apiKey']
-      }
-    ]
+    strategies:
+      [
+        {
+          storage: localStorage, paths: ['apiKey']
+        }
+      ]
+  },
+  actions: {
+    setApiKey(apiKey) {
+      this.apiKey = apiKey
+    },
+    setReturnUrl(returnUrl) {
+      this.returnUrl = returnUrl
+    }
   }
 })
-
-
-export const setApiKey = (apiKey) => {
-  useAuthStore().apiKey = apiKey
-}
-
-export const getApiKey = () => {
-  return useAuthStore().apiKey
-}
-
-export const setReturnUrl = (returnUrl) => {
-  useAuthStore().returnUrl = returnUrl
-}
-
-export const getReturnUrl = () => {
-  return useAuthStore().returnUrl
-}

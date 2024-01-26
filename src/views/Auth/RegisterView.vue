@@ -1,8 +1,11 @@
 <script >
-import { setApiKey } from '@/stores/Auth.js'
-import api from '@/plugins/api.js'
-import { normalizeClass } from 'vue'
+import { useAuthStore } from '@/stores/Auth.js'
+import { mapActions, mapState } from 'pinia'
 export default {
+  computed: {
+    ...mapState(useAuthStore, ['apiKey']),
+    ...mapState(useAuthStore, ['returnUrl']),
+  },
   data() {
     return {
       name: "",
@@ -12,16 +15,17 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useAuthStore, ['setApiKey']),
     register() {
       this.errors = [];
-      api.post("apikeys", {
+      this.$api.post("apikeys", {
         name: `${this.firstname} ${this.name}`,
         email: this.email,
       }).then((resp) => {
-        setApiKey(resp.key);
-        this.$router.push({ name: "home" });
+        this.setApiKey(`key=${resp.data.key}`);
+        this.$router.push(this.returnUrl || "/");
       }).catch((err) => {
-        this.errors.push(err.errors);
+        this.errors.push(err.response.data.errors[0]);
       })
     }
   }
@@ -30,6 +34,8 @@ export default {
 
 <template>
   <div>
+    {{'returnUrl : ' + returnUrl}}
+    {{"apiKey : " + apiKey}}
     {{errors[errors.length - 1]}}
     <h2>Register Page</h2>
     <h3>Nom</h3>
@@ -39,7 +45,7 @@ export default {
     <h3>Email</h3>
     <input v-model="email" type="text" placeholder="email">
     <button @click="register">Register</button>
-    <RouterLink to="/login">Login</RouterLink>
+    <RouterLink to="/auth/login">Login</RouterLink>
   </div>
 </template>
 

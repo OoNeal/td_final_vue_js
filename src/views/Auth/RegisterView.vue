@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/Auth.js'
 import { mapActions, mapState } from 'pinia'
 export default {
   computed: {
+    //Les variables du stores sont accessibles dans les computed
     ...mapState(useAuthStore, ['apiKey']),
     ...mapState(useAuthStore, ['returnUrl']),
   },
@@ -15,6 +16,7 @@ export default {
     }
   },
   methods: {
+    //Les actions du stores sont accessibles dans les methods
     ...mapActions(useAuthStore, ['setApiKey']),
     register() {
       this.errors = [];
@@ -34,9 +36,6 @@ export default {
 
 <template>
   <div>
-    {{'returnUrl : ' + returnUrl}}
-    {{"apiKey : " + apiKey}}
-    {{errors[errors.length - 1]}}
     <h2>Register Page</h2>
     <h3>Nom</h3>
     <input v-model="name" type="text" placeholder="Nom">

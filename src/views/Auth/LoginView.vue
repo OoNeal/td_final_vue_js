@@ -28,8 +28,6 @@ export default {
 
 <template>
   <div>
-    {{"apiKey : " + apiKey}}
-    {{errors[errors.length - 1]}}
     <h2>Login Page</h2>
     <input v-model="userKey">
     <button @click="login">Login</button>

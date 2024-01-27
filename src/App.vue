@@ -1,8 +1,11 @@
 <script >
 import {RouterView } from 'vue-router'
-import Navigation from '@/components/Navigation.vue'
+import Navigation from '@/components/NavigationComponent.vue'
+import { useAuthStore } from '@/stores/Auth.js'
+
 
 export default {
+  methods: { useAuthStore },
   components: {
     RouterView,
     Navigation
@@ -11,6 +14,7 @@ export default {
 </script>
 
 <template>
+  <Navigation v-if="useAuthStore().apiKey"/>
   <RouterView />
 </template>
 

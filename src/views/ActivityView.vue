@@ -1,5 +1,5 @@
 <script>
-import Activity from '@/components/Activity.vue'
+import Activity from '@/components/ActivityComponent.vue'
 
 export default {
   components: {

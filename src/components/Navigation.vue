@@ -2,7 +2,7 @@
  <nav>
     <div class="upperNav">
         <button @click="toggleTimer">Commencer son temps de travail:   {{ formatTime(duration) }}   </button>
-        <p>nombres d'objectifs atteints: {{ displayProject }} </p>
+        <p>nombres d'objectifs atteints:  </p>
         <routerLink to="../views/Activity.vue">Voir les activités</routerLink>
         <routerLink to="../views/Project.vue">Voir les statistiques</routerLink>
 
@@ -30,7 +30,7 @@ export default{
         startTime: null,
         duration: 0,
         timerInterval: null,
-        project: api.get('/api/projects'),
+        
     };
     },
     methods: {
@@ -66,10 +66,7 @@ export default{
 
       return formattedTime;
     },
-    displayProject() {
-      const pastProject = this.project
-      return pastProject
-    }
+  
   },
 }
 
@@ -167,6 +164,9 @@ nav {
 img{
     width: 25px;
     height:25px;
+    text-align:center;
+    vertical-align:middle;
+    padding:2px;
 }
 
 </style>

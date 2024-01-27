@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getApiKey, setReturnUrl } from '@/stores/Auth.js'
 import Activity from "@/views/Activity.vue";
+import { useAuthStore } from '@/stores/Auth.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,16 +29,17 @@ const router = createRouter({
   ]
 });
 
-/*router.beforeEach(async (to) => {
+router.beforeEach(async (to) => {
   const publicPages = ['/auth/login', '/auth/register'];
   const authRequired = !publicPages.includes(to.path);
-  const apiKey = getApiKey();
+  const store = useAuthStore();
 
-  if (authRequired && !apiKey) {
-    setReturnUrl(to.path);
+  if (authRequired && store.apiKey === null) {
+    store.$patch({ returnUrl: to.path });
     return '/auth/login';
+  } else if (!authRequired && store.apiKey !== null) {
+    return '/';
   }
-
-});*/
+});
 
 export default router

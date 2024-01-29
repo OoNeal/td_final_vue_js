@@ -1,26 +1,36 @@
-<script >
+<script>
 import { useAuthStore } from '@/stores/Auth.js'
-import { mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 
 export default {
   computed: {
     ...mapState(useAuthStore, ['apiKey']),
-    ...mapState(useAuthStore, ['returnUrl']),
+    ...mapState(useAuthStore, ['returnUrl'])
   },
   data() {
     return {
-      userKey: "",
-      errors: [],
+      userKey: '',
+      errors: []
     }
   },
   methods: {
+    ...mapActions(useAuthStore, ['setApiKey']),
     login() {
-      this.errors = [];
-      if (this.userKey !== this.apiKey) {
-        this.errors.push("La clé API est incorrecte");
-        return;
+      this.errors = []
+      if (this.apiKey !== this.userKey && this.apiKey === null) {
+        this.$api.get('profile', {
+          headers: {
+            Authorization: `key=${this.userKey}`
+          }
+        }).then(() => {
+          this.setApiKey(this.userKey)
+          this.$router.push(this.returnUrl || '/')
+        }).catch(() => {
+          this.errors.push('Clé invalide')
+        })
+      } else {
+        this.$router.push(this.returnUrl || '/')
       }
-      this.$router.push(this.returnUrl || "/");
     }
   }
 }

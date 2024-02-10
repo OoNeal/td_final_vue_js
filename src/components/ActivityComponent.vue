@@ -33,7 +33,6 @@ export default {
     },
     deleteEntry(entryId) {
       this.$api.delete('time-entries/' + entryId).then((resp) => {
-        console.log(resp)
         this.entries.forEach(entry => {
           if (entry.id === entryId) {
             this.entries.splice(this.entries.indexOf(entry), 1)

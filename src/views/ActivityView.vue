@@ -1,5 +1,6 @@
 <script>
 import Activity from '@/components/ActivityComponent.vue'
+import {all} from "axios";
 //TODO : penser à disable les projets et les activités concernées quand la time entry se finit ?
 export default {
   components: {
@@ -12,6 +13,8 @@ export default {
       currentTimeEntry: [],
       timer: "",
       activitiesToday: [],
+      allProjects: [],
+      allActivities: [],
       enabledActivities: [],
       enabledProjects: [],
       newActivityData: {
@@ -30,48 +33,65 @@ export default {
         comment: ""
       },
       createTimeEntryData: {
+        creating: false,
         activity_id: "",
         project_id: "",
         comment: "",
         start: "",
         end: ""
-      }
+      },
+      filters : {
+        project_id: "",
+        activity_id: "",
+        comment: ""
+      },
+      errors: []
     }
   },
   created() {
-    console.log(new Date().toLocaleString().replace(" ", "T").replaceAll("/", "-"))
     //on récup l'activité en cours (time entry en cours, qui n'a pas de fin)
     this.$api.get('time-entries?end=').then((resp) => {
       this.currentTimeEntry = resp.data
     })
 
-    //recupere les times entries du jour
-    this.$api.get('time-entries?from=' + this.currentDate + '&to=' + this.currentDate).then((resp) => {
-      this.timeEntriesToday = resp.data
-      let activtyIds = []
-      //de la, on recup les id des activités qui ont une time entry a ce jour (et qui donc ont été réalisées à ce jour)
-      //puis on recup les infos des activités correspondantes
-      resp.data.forEach(element => {
-        if (!activtyIds.includes(element.activity_id)) {
-          activtyIds.push(element.activity_id)
-          this.getActivityToday(element.activity_id)
-        }
-      });
-    })
+    this.getTimeEntriesToday()
 
-    //on récup toutes les activités et tous les projets QUI SONT ENABLED pr pouvoir afficher select pour créer une time entry
-    //cf Ajouter une activité
-    this.$api.get('activities?is_enabled=1').then((resp) => {
-      this.enabledActivities = resp.data
+    this.$api.get('activities').then((resp) => {
+      this.allActivities = resp.data
+      this.enabledActivities = resp.data.filter(item => item.is_enabled === 1);
     })
-    this.$api.get('projects?is_enabled=1').then((resp) => {
-      this.enabledProjects = resp.data
+    this.$api.get('projects').then((resp) => {
+      this.allProjects = resp.data
+      this.enabledProjects = resp.data.filter(item => item.is_enabled === 1);
     })
     window.setInterval(() => {
       this.calcTimeSince()
     }, 1000)
   },
   methods: {
+    all,
+    getTimeEntriesToday() {
+      this.$api.get('time-entries?from=' + this.currentDate + '&to=' + this.currentDate).then((resp) => {
+        this.timeEntriesToday = resp.data
+        let activtyIds = []
+        resp.data.forEach(element => {
+          if (!activtyIds.includes(element.activity_id)) {
+            activtyIds.push(element.activity_id)
+            this.getActivityToday(element.activity_id)
+          }
+        });
+      })
+    },
+    entriesToPass(activityId) {
+      // méthode pr bind seulement les bonnes entries à activité
+      let entries = []
+      this.timeEntriesToday.forEach(entry => {
+        if (entry.activity_id === activityId) {
+          entries.push(entry)
+        }
+      })
+      return entries
+    },
     calcTimeSince() {
       if (this.currentTimeEntry.length !== 0) {
         const date = new Date(this.currentTimeEntry[0].start);
@@ -100,7 +120,9 @@ export default {
     getActivityToday(id) {
       //utilisé pour récup les infos sur les activités qui ont une time entry à ce jour
       this.$api.get('activities/' + id).then((resp) => {
-        this.activitiesToday.push(resp.data)
+        if (!this.activitiesToday.find(activity => activity.id === resp.data.id)) {
+          this.activitiesToday.push(resp.data);
+        }
       })
     },
     popup(arg) {
@@ -116,9 +138,12 @@ export default {
         color: this.newActivityData.color
       }).then((resp) => {
         this.enabledActivities.push(resp.data)
+        this.allActivities.push(resp.data)
         this.newActivityData.creating = false
       }).catch((err) => {
         console.log(err.response.data.errors)
+        //TODO : faire ça partout ;)
+        this.errors.push(err)
       })
     },
     createProject() {
@@ -127,6 +152,7 @@ export default {
         description: this.newProjectData.description
       }).then((resp) => {
         this.enabledProjects.push(resp.data)
+        this.allProjects.push(resp.data)
         this.newProjectData.creating = false
       }).catch((err) => {
         console.log(err.response.data.errors)
@@ -138,16 +164,20 @@ export default {
           project_id: this.createTimeEntryData.project_id,
           activity_id: this.createTimeEntryData.activity_id,
           comment: this.createTimeEntryData.comment,
-          start: this.createTimeEntryData.start,
-          end: this.createTimeEntryData.end
+          start: this.createTimeEntryData.start.replace("T", " "),
+          end: this.createTimeEntryData.end.replace("T", " ")
         }).then((resp) => {
+          // TODO : push dans activitiesToday si la date de début et de fin c ajrd
+          console.log("createTimeEntry", resp.data)
+          //this.activitiesToday.push(resp.data)
           this.createTimeEntryData.activity_id = ""
           this.createTimeEntryData.project_id = ""
           this.createTimeEntryData.comment = ""
           this.createTimeEntryData.start = ""
           this.createTimeEntryData.end = ""
+          this.getTimeEntriesToday()
         }).catch((err) => {
-          console.log(err.data)
+          console.log(err)
         })
       }
     },
@@ -171,45 +201,113 @@ export default {
     },
     stopActivity() {
       this.$api.patch(`time-entries/${this.currentTimeEntry[0].id}/stop`).then((resp) => {
+        // ça push bien quand on a déjà des entries sur l'activité
+        this.getTimeEntriesToday()
         this.currentTimeEntry = []
-        this.timeEntriesToday.push(resp.data)
       }).catch((err) => {
         console.log(err.response.data)
       })
-    }
+    },
+    filterEntries() {
+
+    },
+    deleteFilters() {
+      this.filters.project_id = ""
+      this.filters.activity_id = ""
+      this.filters.comment = ""
+    },
   }
 }
 </script>
 
 <template>
-  <div class="current-activity">
-    <div v-if="currentTimeEntry.length !== 0">
-      <h2>Activité en cours : </h2>
-      <div>Timer : {{ timer }}</div>
-      <button @click="stopActivity()">Arrêter</button>
+
+  <div v-if="currentTimeEntry.length !== 0" class="current-activity">
+    <h1>En cours :</h1>
+    <div class="timer">{{ timer }}</div>
+    <div class="">Nom de l'activité</div>
+    <div class="">Nom du projet</div>
+    <button @click="stopActivity()">STOP</button>
+  </div>
+
+  <div v-else class="start-activity">
+    <h1>Lancer une activité :</h1>
+    <div class="select-project">
+      <select v-model="newTimeEntryData.project_id" name="activity">
+        <option value="" selected disabled>Projet concerné</option>
+        <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
+      </select>
+      <button v-if="!newProjectData.creating" @click="popup(2)">Nouveau projet</button>
+
     </div>
-    <div v-else>
-      <h2> pas de acti en cours donc : Ajouter une activité : </h2>
-      <div>
-        <select v-model="newTimeEntryData.project_id" name="activity">
+    <div class="select-activity">
+      <select v-model="newTimeEntryData.activity_id" name="project">
+        <option value="" selected disabled>Type d'activité</option>
+        <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{
+            activity.name
+          }}
+        </option>
+      </select>
+      <button v-if="!newActivityData.creating" @click="popup(1)">Nouvelle activité</button>
+    </div>
+    <div class="select-comment">
+      <input v-model="newTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
+    </div>
+    <button @click="startActivity()">Lancer</button>
+  </div>
+
+  <div class="activities">
+    <h2>Vos activités ajrd :</h2>
+    <button @click="createTimeEntryData.creating = !createTimeEntryData.creating">Créer une entrée</button>
+    <div v-if="createTimeEntryData.creating === true" class="create-entry">
+      <h3>Créer une entrée : </h3>
+      <div class="select-project">
+        <select v-model="createTimeEntryData.project_id" name="activity">
           <option value="" selected disabled>Projet concerné</option>
           <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
         </select>
-        <button v-if="!newActivityData.creating" @click="popup(1)">Nouvelle activité</button>
+        <button v-if="!createTimeEntryData.creating" @click="popup(1)">Nouvelle activité</button>
       </div>
-      <div>
-        <select v-model="newTimeEntryData.activity_id" name="project">
+      <div class="select-activity">
+        <select v-model="createTimeEntryData.activity_id" name="project">
           <option value="" selected disabled>Type d'activité</option>
-          <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{activity.name }}</option>
+          <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{
+              activity.name
+            }}
+          </option>
         </select>
-        <button v-if="!newProjectData.creating" @click="popup(2)">Nouveau projet</button>
+        <button v-if="!createTimeEntryData.creating" @click="popup(2)">Nouveau projet</button>
       </div>
-      <div>
-        <input v-model="newTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
+      <div class="select-comment">
+        <input v-model="createTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
       </div>
-      <button @click="startActivity()">Lancer</button>
+      <div class="select-times">
+        <input v-model="createTimeEntryData.start" type="datetime-local" name="start">
+        <input v-model="createTimeEntryData.end" type="datetime-local" name="end">
+      </div>
+      <button @click="createTimeEntry()">Ajouter</button>
+    </div>
+
+    <div class="activities-list">
+      <div class="filters">
+        Filtrer la liste :
+        <select @change="filterEntries" v-model="filters.project_id" name="filter-project">
+          <option value="" selected disabled>Projet concerné</option>
+          <option v-for="project in allProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
+        </select>
+        <select @change="filterEntries" v-model="filters.activity_id" name="filter-activity">
+          <option value="" selected disabled>Activité concernée</option>
+          <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{ activity.name }}</option>
+        </select>
+        <input @change="filterEntries" v-model="filters.comment" type="text" name="commentaire" placeholder="Commentaire">
+        <button @click="deleteFilters">Supp les filtres</button>
+      </div>
+      <Activity @update-entries="getTimeEntriesToday" v-for="activity in activitiesToday" :key="activity.id"
+                :color="activity.color" :activityId="activity.id"
+                :name="activity.name" :entries="entriesToPass(activity.id)"/>
     </div>
   </div>
+
   <div id="popupNewActivity" v-if="newActivityData.creating">
     <div>Nouvelle activité :</div>
     <div @click="popup(1)" class="close">ANNULER</div>
@@ -225,38 +323,26 @@ export default {
     <button @click="createProject()">Créer le projet</button>
   </div>
 
-  <h2> Liste des activités réalisées ajrd : </h2>
-  <div>
-    <h2>Créer une entrée : </h2>
-    <div>
-      <select v-model="createTimeEntryData.project_id" name="activity">
-        <option value="" selected disabled>Projet concerné</option>
-        <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
-      </select>
-      <button v-if="!createTimeEntryData.creating" @click="popup(1)">Nouvelle activité</button>
-    </div>
-    <div>
-      <select v-model="createTimeEntryData.activity_id" name="project">
-        <option value="" selected disabled>Type d'activité</option>
-        <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{activity.name }}</option>
-      </select>
-      <button v-if="!createTimeEntryData.creating" @click="popup(2)">Nouveau projet</button>
-    </div>
-    <div>
-      <input v-model="createTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
-    </div>
-    <div>
-      <input v-model="createTimeEntryData.start" type="datetime-local"  name="start">
-      <input v-model="createTimeEntryData.end" type="datetime-local" name="end">
-    </div>
-    <button @click="createTimeEntry()">Ajouter</button>
-  </div>
-  <div class="activities">
-    <Activity v-for="activity in activitiesToday" :key="activity.id" :color="activity.color" :activityId="activity.id"
-              :name="activity.name" :entries="timeEntriesToday"/>
-  </div>
+
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.current-activity {
+  border: 1px solid red;
+}
+
+.start-activity {
+  border: 1px solid green;
+}
+
+.activities {
+  border: 1px solid blue;
+
+  .create-entry {
+    border: 1px solid orange;
+  }
+
+}
+
 
 </style>

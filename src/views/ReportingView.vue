@@ -46,7 +46,24 @@ export default {
       dates.push(new Date(this.endDate))
       return dates
     },
+    getTimesEntries() {
+      this.$api.get('time-entries?from=' + this.formatDateToApi(this.startDate) + '&to=' + this.formatDateToApi(this.endDate)).then((resp) => {
+        this.timeEntries = resp.data
+      })
+    },
+    getWorkingHours() {
+      let workingHours = 0
+      this.timeEntries.forEach(entry => {
+        let start = new Date(entry.start)
+        let end = new Date(entry.end)
+        workingHours += (end - start) / 1000 / 60 / 60
+      })
+      return workingHours
+    }
   },
+  created() {
+    this.getTimesEntries()
+  }
 }
 </script>
 
@@ -71,6 +88,9 @@ export default {
         </DatePicker>
       </template>
     </ReportingHeader>
+
+    <h3>Sur cette période vous avez travaillé pendant</h3>
+    <h2>{{ getWorkingHours() }}</h2>
   </main>
 </template>
 

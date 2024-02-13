@@ -7,7 +7,7 @@ export default {
             baseURL : 'https://timely.edu.netlor.fr/api/',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': useAuthStore().apiKey
+                'Authorization': "key=" + useAuthStore().apiKey
             }
         })
     }

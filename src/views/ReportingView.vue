@@ -16,36 +16,6 @@ export default {
     }
   },
   methods: {
-    orderDates() {
-      if (this.startDate > this.endDate) {
-        let temp = this.startDate
-        this.startDate = this.endDate
-        this.endDate = temp
-      }
-    },
-    formatDateToDisplay(date) {
-      let month = date.getMonth() + 1
-      month < 10 ? month = '0' + month : month
-      return date.getDate() + '/' + month + '/' + date.getFullYear()
-    },
-    formatDateToApi(date) {
-      date = this.formatDateToDisplay(date)
-      return date.split('/').reverse().join('-')
-    },
-    displayedDate(date) {
-      this.orderDates()
-      return this.formatDateToDisplay(date)
-    },
-    intervalDates() {
-      let dates = []
-      let currentDate = new Date(this.startDate)
-      while (currentDate <= this.endDate) {
-        dates.push(new Date(currentDate))
-        currentDate.setDate(currentDate.getDate() + 1)
-      }
-      dates.push(new Date(this.endDate))
-      return dates
-    },
     getTimesEntries() {
       this.$api.get('time-entries?from=' + this.formatDateToApi(this.startDate) + '&to=' + this.formatDateToApi(this.endDate)).then((resp) => {
         this.timeEntries = resp.data
@@ -59,6 +29,69 @@ export default {
         workingHours += (end - start) / 1000 / 60 / 60
       })
       return workingHours
+    },
+    getTimesEntriesByProject() {
+      let projects = []
+      this.timeEntries.forEach(entry => {
+        if (!projects.includes(entry.project)) {
+          projects.push(entry.project)
+        }
+      })
+      return projects
+    },
+    getTimesEntriesByActivity() {
+      let activities = []
+      this.timeEntries.forEach(entry => {
+        if (!activities.includes(entry.activity)) {
+          activities.push(entry.activity)
+        }
+      })
+      return activities
+    },
+
+    orderDates() {
+      if (this.startDate > this.endDate) {
+        let temp = this.startDate
+        this.startDate = this.endDate
+        this.endDate = temp
+      }
+    },
+    intervalDates() {
+      let dates = []
+      let currentDate = new Date(this.startDate)
+      while (currentDate <= this.endDate) {
+        dates.push(new Date(currentDate))
+        currentDate.setDate(currentDate.getDate() + 1)
+      }
+      dates.push(new Date(this.endDate))
+      return dates
+    },
+    updateView(date) {
+      this.getTimesEntries()
+      this.orderDates()
+      return this.formatDateToDisplay(date)
+    },
+
+    formatDateToDisplay(date) {
+      let day = date.getDate()
+      let month = date.getMonth() + 1
+      month < 10 ? month = '0' + month : month
+      day < 10 ? day = '0' + day : day
+      return day + '/' + month + '/' + date.getFullYear()
+    },
+    formatDateToApi(date) {
+      date = this.formatDateToDisplay(date)
+      return date.split('/').reverse().join('-')
+    },
+    formatWorkingHours() {
+      let workingHours = this.getWorkingHours()
+      let hours = Math.floor(workingHours)
+      let minutes = Math.floor((workingHours - hours) * 60)
+      let seconds = Math.floor(((workingHours - hours) * 60 - minutes) * 60)
+      hours < 10 ? hours = '0' + hours : hours
+      minutes < 10 ? minutes = '0' + minutes : minutes
+      seconds < 10 ? seconds = '0' + seconds : seconds
+      return hours + 'h ' + minutes + 'm ' + seconds + 's'
     }
   },
   created() {
@@ -75,7 +108,7 @@ export default {
         <DatePicker class="datepicker-size" v-model="startDate" :enable-time-picker="false"
                     :highlight="intervalDates()" :max-date="new Date()" prevent-min-max-navigation auto-apply>
           <template #trigger>
-            <span class="clickable-text">{{ displayedDate(startDate) }}</span>
+            <span class="clickable-text">{{ updateView(startDate) }}</span>
           </template>
         </DatePicker>
       </template>
@@ -83,14 +116,16 @@ export default {
         <DatePicker class="datepicker-size" v-model="endDate" :enable-time-picker="false"
                     :highlight="intervalDates()" :max-date="new Date()" prevent-min-max-navigation auto-apply>
           <template #trigger>
-            <span class="clickable-text">{{ displayedDate(endDate) }}</span>
+            <span class="clickable-text">{{ updateView(endDate) }}</span>
           </template>
         </DatePicker>
       </template>
     </ReportingHeader>
 
     <h3>Sur cette période vous avez travaillé pendant</h3>
-    <h2>{{ getWorkingHours() }}</h2>
+    <h2>{{ formatWorkingHours() }}</h2>
+
+
   </main>
 </template>
 

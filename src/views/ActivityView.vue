@@ -1,10 +1,13 @@
 <script>
 import Activity from '@/components/ActivityComponent.vue'
+import TimeEntry from "@/components/TimeEntry.vue";
 import {all} from "axios";
+
 //TODO : penser à disable les projets et les activités concernées quand la time entry se finit ?
 export default {
   components: {
-    Activity
+    Activity,
+    TimeEntry
   },
   data() {
     return {
@@ -257,7 +260,7 @@ export default {
   </div>
 
   <div class="activities">
-    <h2>Vos activités ajrd :</h2>
+    <h2>Vos activités du jour :</h2>
     <button @click="createTimeEntryData.creating = !createTimeEntryData.creating">Créer une entrée</button>
     <div v-if="createTimeEntryData.creating === true" class="create-entry">
       <h3>Créer une entrée : </h3>
@@ -302,7 +305,8 @@ export default {
         <input @change="filterEntries" v-model="filters.comment" type="text" name="commentaire" placeholder="Commentaire">
         <button @click="deleteFilters">Supp les filtres</button>
       </div>
-      <Activity @update-entries="getTimeEntriesToday" v-for="activity in activitiesToday" :key="activity.id"
+      <time-entry v-for="entry in timeEntriesToday" :key="entry.id" :entry="entry"/>
+      <activity @update-entries="getTimeEntriesToday" v-for="activity in activitiesToday" :key="activity.id"
                 :color="activity.color" :activityId="activity.id"
                 :name="activity.name" :entries="entriesToPass(activity.id)"/>
     </div>

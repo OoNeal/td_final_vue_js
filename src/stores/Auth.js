@@ -26,6 +26,9 @@ export const useAuthStore = defineStore('auth', {
     },
     setReturnUrl(returnUrl) {
       this.returnUrl = returnUrl
+    },
+    clearApiKey() {
+      this.apiKey = null
     }
   }
 })

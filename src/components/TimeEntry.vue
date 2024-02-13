@@ -3,27 +3,27 @@
 export default {
   emits: ['updateEntries'],
   props: {
-    activityId: {
-      type: String,
+    entry:{
+      type: Object,
       required: true
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    entries : {
-      type: Array,
-      required: true
-    },
-    color : {
-      type: String,
-      required: false
     }
   },
   data() {
     return {
-      newEntry : null
+      newEntry : null,
+      project: "",
+      activity: "",
+      color: ""
     }
+  },
+  created() {
+    this.$api.get(`projects/${this.entry.project_id}`).then((resp) => {
+      this.project = resp.data.name
+    })
+    this.$api.get(`activities/${this.entry.activity_id}`).then((resp) => {
+      this.activity = resp.data.name
+      this.color = resp.data.color
+    })
   },
   methods : {
     getHours(date) {
@@ -37,21 +37,19 @@ export default {
         this.$emit('update-entries')
       })
     },
-    changeEntry(entryId) {
-      this.newEntry = {...this.entries.find(entry => entry.id === entryId)};
+    changeEntry() {
+      this.newEntry = this.entry;
       this.newEntry.beingChanged = true
       this.$emit('update-entries')
     },
-    editEntry(entryId) {
-      this.$api.put('time-entries/' + entryId, {
+    editEntry() {
+      this.$api.put(`time-entries/${this.entry.id}`, {
         project_id: this.newEntry.project_id,
         activity_id: this.newEntry.activity_id,
         start : this.newEntry.start,
         end : this.newEntry.end,
         comment: this.newEntry.comment
-      }).then((resp) => {
-        //this.entries.map(entry => entry.id !== entryId ? entry : resp.data);
-        //console.log(this.entries)
+      }).then(() => {
         this.newEntry = null
         this.$emit('update-entries')
       }).catch((err) => {
@@ -70,20 +68,20 @@ export default {
 </script>
 
 <template>
-  <div class="daily-activity">
-    <div v-color="color">{{name}}</div>
-    <div v-for="entry in entries"  :key="entry.id">
-      <div v-if="entry.activity_id === activityId">de {{getHours(entry.start)}} à {{getHours(entry.end)}}</div>
-      <img v-if="entry.activity_id === activityId" @click="changeEntry(entry.id)" src="@/assets/icons/edit.svg" alt="edit icon">
-      <img v-if="entry.activity_id === activityId" @click="deleteEntry(entry.id)" src="@/assets/icons/delete.svg" alt="trash icon">
-    </div>
+  <div class="entry">
+    <div>{{project}}</div>
+    <div v-color="color">{{activity}}</div>
+    <div>{{getHours(entry.start)}} - {{getHours(entry.end)}}</div>
+    <div>{{entry.comment}}</div>
+    <img @click="changeEntry()" src="@/assets/icons/edit.svg" alt="edit icon">
+    <img @click="deleteEntry()" src="@/assets/icons/delete.svg" alt="trash icon">
   </div>
 
   <div class="change-entry" v-if="newEntry !== null">
     <input type="datetime-local" v-model="newEntry.start">
     <input type="datetime-local" v-model="newEntry.end">
     <input type="text" v-model="newEntry.comment">
-    <button @click="editEntry(newEntry.id)">Valider</button>
+    <button @click="editEntry()">Valider</button>
   </div>
 </template>
 

@@ -5,7 +5,7 @@
       <p>nombres d'objectifs atteints: </p>
       <routerLink to="/activity">Voir les activités</routerLink>
       <routerLink to="/project">Voir les projets</routerLink>
-
+      <p @click="logout()">Logout</p>
     </div>
 
     <div class="bottomNav">
@@ -21,7 +21,8 @@
 </template>
 
 <script>
-
+import { mapActions } from 'pinia'
+import { useAuthStore } from '@/stores/Auth.js'
 
 export default {
   data() {
@@ -34,6 +35,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useAuthStore, ['clearApiKey']),
+    logout() {
+      this.clearApiKey()
+      this.$router.push('/auth/login')
+    },
     toggleTimer() {
       if (this.timerRunning) {
         this.stopTimer()

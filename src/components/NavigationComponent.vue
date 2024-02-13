@@ -4,7 +4,7 @@
       <button @click="toggleTimer">Commencer son temps de travail: {{ formatTime(duration) }}</button>
       <p>nombres d'objectifs atteints: </p>
       <routerLink to="/activity">Voir les activités</routerLink>
-      <routerLink to="/project">Voir les statistiques</routerLink>
+      <routerLink to="/project">Voir les projets</routerLink>
 
     </div>
 
@@ -14,7 +14,7 @@
       <button type="button" aria-label="stop"><img src="../assets/img/Stop_button.png">Stopper l'activité en cours
       </button>
       <routerLink to="/setting">Paramètres globaux</routerLink>
-      <routerLink to="/setting">Voir les statistiques</routerLink>
+      <routerLink to="/reporting">Voir les statistiques</routerLink>
 
     </div>
   </nav>

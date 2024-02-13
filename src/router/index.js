@@ -10,6 +10,10 @@ const router = createRouter({
       component: Activity
     },
     {
+      path: '/reporting',
+      component: () => import('@/views/ReportingView.vue'),
+    },
+    {
       path: '/auth',
       name: 'auth',
       component: () => import('@/views/Auth/AuthView.vue'),

@@ -4,8 +4,8 @@
       <button @click="toggleTimer">Commencer son temps de travail: {{ formatTime(duration) }}</button>
       <p>nombres d'objectifs atteints: </p>
       <routerLink to="/activity">Voir les activités</routerLink>
-      <routerLink to="/project">Voir les statistiques</routerLink>
-
+      <routerLink to="/project">Voir les projets</routerLink>
+      <p @click="logout()">Logout</p>
     </div>
 
     <div class="bottomNav">
@@ -14,14 +14,15 @@
       <button type="button" aria-label="stop"><img src="../../public/img/Stop_button.png">Stopper l'activité en cours
       </button>
       <routerLink to="/setting">Paramètres globaux</routerLink>
-      <routerLink to="/setting">Voir les statistiques</routerLink>
+      <routerLink to="/reporting">Voir les statistiques</routerLink>
 
     </div>
   </nav>
 </template>
 
 <script>
-
+import { mapActions } from 'pinia'
+import { useAuthStore } from '@/stores/Auth.js'
 
 export default {
   data() {
@@ -34,6 +35,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useAuthStore, ['clearApiKey']),
+    logout() {
+      this.clearApiKey()
+      this.$router.push('/auth/login')
+    },
     toggleTimer() {
       if (this.timerRunning) {
         this.stopTimer()

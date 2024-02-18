@@ -25,7 +25,11 @@ const router = createRouter({
           component: () => import('@/views/Auth/RegisterView.vue'),
         }
       ]
-    }
+    },
+    {
+      path: '/reporting',
+      component: () => import('@/views/ReportingView.vue'),
+    },
   ]
 });
 

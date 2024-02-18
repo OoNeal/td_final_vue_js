@@ -11,7 +11,7 @@
     <div class="bottomNav">
 
       <p>Activités en cours: </p>
-      <button type="button" aria-label="stop"><img src="../assets/img/Stop_button.png">Stopper l'activité en cours
+      <button type="button" aria-label="stop"><img src="../../public/img/Stop_button.png">Stopper l'activité en cours
       </button>
       <routerLink to="/setting">Paramètres globaux</routerLink>
       <routerLink to="/setting">Voir les statistiques</routerLink>

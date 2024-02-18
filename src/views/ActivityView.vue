@@ -1,13 +1,12 @@
 <script>
-import Activity from '@/components/ActivityComponent.vue'
-import TimeEntry from "@/components/TimeEntry.vue";
-import {all} from "axios";
+import TimeEntry from "@/components/TimeEntryComponent.vue";
+import PopUp from "@/components/PopUpComponent.vue";
 
 //TODO : penser à disable les projets et les activités concernées quand la time entry se finit ?
 export default {
   components: {
-    Activity,
-    TimeEntry
+    TimeEntry,
+    PopUp
   },
   data() {
     return {
@@ -15,7 +14,6 @@ export default {
       currentDate: new Date().toISOString().slice(0, 10),
       currentTimeEntry: [],
       timer: "",
-      activitiesToday: [],
       allProjects: [],
       allActivities: [],
       enabledActivities: [],
@@ -72,28 +70,10 @@ export default {
     }, 1000)
   },
   methods: {
-    all,
     getTimeEntriesToday() {
       this.$api.get('time-entries?from=' + this.currentDate + '&to=' + this.currentDate).then((resp) => {
         this.timeEntriesToday = resp.data
-        let activtyIds = []
-        resp.data.forEach(element => {
-          if (!activtyIds.includes(element.activity_id)) {
-            activtyIds.push(element.activity_id)
-            this.getActivityToday(element.activity_id)
-          }
-        });
       })
-    },
-    entriesToPass(activityId) {
-      // méthode pr bind seulement les bonnes entries à activité
-      let entries = []
-      this.timeEntriesToday.forEach(entry => {
-        if (entry.activity_id === activityId) {
-          entries.push(entry)
-        }
-      })
-      return entries
     },
     calcTimeSince() {
       if (this.currentTimeEntry.length !== 0) {
@@ -119,14 +99,6 @@ export default {
     getHours(date) {
       let time = date.split(" ")[1]
       return time.split(":")[0] + "h" + time.split(":")[1]
-    },
-    getActivityToday(id) {
-      //utilisé pour récup les infos sur les activités qui ont une time entry à ce jour
-      this.$api.get('activities/' + id).then((resp) => {
-        if (!this.activitiesToday.find(activity => activity.id === resp.data.id)) {
-          this.activitiesToday.push(resp.data);
-        }
-      })
     },
     popup(arg) {
       if (arg === 1) {
@@ -305,27 +277,22 @@ export default {
         <input @change="filterEntries" v-model="filters.comment" type="text" name="commentaire" placeholder="Commentaire">
         <button @click="deleteFilters">Supp les filtres</button>
       </div>
-      <time-entry v-for="entry in timeEntriesToday" :key="entry.id" :entry="entry"/>
-      <activity @update-entries="getTimeEntriesToday" v-for="activity in activitiesToday" :key="activity.id"
-                :color="activity.color" :activityId="activity.id"
-                :name="activity.name" :entries="entriesToPass(activity.id)"/>
+      <time-entry @update-entries="getTimeEntriesToday" v-for="entry in timeEntriesToday" :key="entry.id" :entry="entry"/>
     </div>
   </div>
 
-  <div id="popupNewActivity" v-if="newActivityData.creating">
+  <pop-up @close="newActivityData.creating = false" id="popupNewActivity" v-if="newActivityData.creating">
     <div>Nouvelle activité :</div>
-    <div @click="popup(1)" class="close">ANNULER</div>
     <input type="text" v-model="newActivityData.name" placeholder="Nom de l'activité">
     <input type="color" v-model="newActivityData.color">
     <button @click="createActivity()">Créer l'activité</button>
-  </div>
-  <div id="popupNewProject" v-if="newProjectData.creating">
+  </pop-up>
+  <pop-up @close="newProjectData.creating = false" id="popupNewProject" v-if="newProjectData.creating">
     <div>Nouveau projet :</div>
-    <div @click="popup(2)" class="close">ANNULER</div>
     <input type="text" v-model="newProjectData.name" placeholder="Nom de du projet">
     <input type="text" v-model="newProjectData.description" placeholder="Description du projet">
     <button @click="createProject()">Créer le projet</button>
-  </div>
+  </pop-up>
 
 
 </template>

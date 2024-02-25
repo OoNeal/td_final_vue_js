@@ -77,8 +77,9 @@ export default {
   },
   watch: {
     objectiveSearch() {
-      console.log(this.objectiveSearch)
-      this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch))
+      this.showObjectivesDone ?
+          this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch))
+          : this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch) && objective.done === 0)
     },
   },
   created() {
@@ -99,9 +100,7 @@ export default {
     })
     this.$api.get('daily-objectives').then((resp) => {
       this.allObjectives = resp.data
-      console.log(this.allObjectives)
       this.displayObjectives = resp.data.filter(objective => objective.done === 0);
-      console.log(this.displayObjectives)
     })
     window.setInterval(() => {
       this.calcTimeSince()
@@ -175,10 +174,12 @@ export default {
       })
     },
     showAllObjectives() {
+      this.objectiveSearch = ""
       this.showObjectivesDone = true
       this.displayObjectives = this.allObjectives
     },
     hideObjectivesDone() {
+      this.objectiveSearch = ""
       this.showObjectivesDone = false
       this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
     },
@@ -303,7 +304,6 @@ export default {
 
   <div class="objectives">
     <h2>Vos objectifs : </h2>
-    {{ objectiveSearch }}
     <input type="text" v-model="objectiveSearch" placeholder="Rechercher un objectif">
     <button @click="newObjectiveData.creating = true">Créer un objectif</button>
     <div v-if="displayObjectives.length > 0" class="objectives-list">

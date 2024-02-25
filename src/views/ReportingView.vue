@@ -4,7 +4,7 @@ import DatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { DoughnutChart } from 'vue-chart-3'
 import { Chart, registerables } from 'chart.js'
-import TimeEntry from '@/components/TimeEntry.vue'
+import TimeEntry from '@/components/TimeEntryComponent.vue'
 
 Chart.register(...registerables)
 export default {

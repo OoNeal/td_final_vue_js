@@ -9,12 +9,13 @@ export default {
   },
   data() {
     return {
-      timeEntriesToday: [],
       currentDate: new Date().toISOString().slice(0, 10),
-      currentTimeEntry: [],
+      currentTimeEntry: null,
       timer: "",
+      timeEntriesToday: [],
+      displayTimeEntriesToday: [],
 
-      //mettre tous les projets et activités ds les filtres
+      //pour les filtres sur ls time-entries
       allProjects: [],
       allActivities: [],
 
@@ -22,11 +23,10 @@ export default {
       enabledActivities: [],
       enabledProjects: [],
 
-      //tous les projets (ceux qui n'ont pas été atteint aussi) et les projects atteints
       allObjectives: [],
+      //que les objectifs qu'on affiche (on filtre allObjectives pour déterminer displayObjectives)
       displayObjectives: [],
       showObjectivesDone: false,
-      //pour chercher un objectif
       objectiveSearch: "",
 
       //création activité
@@ -67,6 +67,7 @@ export default {
         description: ""
       },
 
+      //filtres sur les timeEntries
       filters: {
         project_id: "",
         activity_id: "",
@@ -75,46 +76,47 @@ export default {
       errors: []
     }
   },
-  watch: {
-    objectiveSearch() {
-      this.showObjectivesDone ?
-          this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch))
-          : this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch) && objective.done === 0)
-    },
-  },
   created() {
-    //on récup l'activité en cours (time entry en cours, qui n'a pas de fin)
-    this.$api.get('time-entries?end=').then((resp) => {
-      this.currentTimeEntry = resp.data
-    })
-
-    this.getTimeEntriesToday()
-
-    this.$api.get('activities').then((resp) => {
-      this.allActivities = resp.data
-      this.enabledActivities = resp.data.filter(activity => activity.is_enabled === 1);
-    })
     this.$api.get('projects').then((resp) => {
       this.allProjects = resp.data
       this.enabledProjects = resp.data.filter(project => project.is_enabled === 1);
+    })
+    this.$api.get('activities').then((resp) => {
+      this.allActivities = resp.data
+      this.enabledActivities = resp.data.filter(activity => activity.is_enabled === 1);
     })
     this.$api.get('daily-objectives').then((resp) => {
       this.allObjectives = resp.data
       this.displayObjectives = resp.data.filter(objective => objective.done === 0);
     })
+    //on récup l'activité en cours (time entry en cours, qui n'a pas de fin)
+    this.$api.get('time-entries?end=').then((resp) => {
+      this.currentTimeEntry = resp.data[0]
+      //jsp si c bourrin ou pas de faire ça ???????????
+      if (this.currentTimeEntry) {
+        this.currentTimeEntry.project = this.allProjects.find(project => project.id === this.currentTimeEntry.project_id)
+        this.currentTimeEntry.activity = this.allActivities.find(activity => activity.id === this.currentTimeEntry.activity_id)
+      }
+    })
+    this.getTimeEntriesToday()
+
     window.setInterval(() => {
       this.calcTimeSince()
     }, 1000)
   },
   methods: {
     getTimeEntriesToday() {
+      //TODO : plus judicieux de récup celles qui se sont finies ajrd
+      //pcq là c'est celles qui ont commencé et fini ajrd
+      //mais dc on ferait sans les filtres de l'api
       this.$api.get('time-entries?from=' + this.currentDate + '&to=' + this.currentDate).then((resp) => {
         this.timeEntriesToday = resp.data
+        this.displayTimeEntriesToday = resp.data
       })
     },
     calcTimeSince() {
-      if (this.currentTimeEntry.length !== 0) {
-        const date = new Date(this.currentTimeEntry[0].start);
+      if (this.currentTimeEntry !== null) {
+        const date = new Date(this.currentTimeEntry.start);
         const difference = new Date().getTime() - date.getTime();
         const jours = Math.floor(difference / (1000 * 60 * 60 * 24));
         const heures = Math.floor(difference / (1000 * 60 * 60));
@@ -132,10 +134,6 @@ export default {
           this.timer = heures + ":" + minutes + ":" + secondes
         }
       }
-    },
-    getHours(date) {
-      let time = date.split(" ")[1]
-      return time.split(":")[0] + "h" + time.split(":")[1]
     },
     createActivity() {
       this.$api.post('activities', {
@@ -168,7 +166,7 @@ export default {
         content: this.newObjectiveData.description
       }).then((resp) => {
         this.newObjectiveData.creating = false
-        this.objectives.push(resp.data)
+        this.allObjectives.push(resp.data)
       }).catch((err) => {
         console.log(err.response.data.errors)
       })
@@ -214,7 +212,7 @@ export default {
           activity_id: this.newTimeEntryData.activity_id,
           comment: this.newTimeEntryData.comment
         }).then((resp) => {
-          this.currentTimeEntry[0] = resp.data
+          this.currentTimeEntry = resp.data
           this.calcTimeSince()
           this.newTimeEntryData.activity_id = ""
           this.newTimeEntryData.project_id = ""
@@ -225,16 +223,12 @@ export default {
       }
     },
     stopActivity() {
-      this.$api.patch(`time-entries/${this.currentTimeEntry[0].id}/stop`).then((resp) => {
-        // ça push bien quand on a déjà des entries sur l'activité
+      this.$api.patch(`time-entries/${this.currentTimeEntry.id}/stop`).then((resp) => {
         this.getTimeEntriesToday()
-        this.currentTimeEntry = []
+        this.currentTimeEntry = null
       }).catch((err) => {
         console.log(err.response.data)
       })
-    },
-    filterEntries() {
-
     },
     deleteFilters() {
       this.filters.project_id = ""
@@ -242,16 +236,33 @@ export default {
       this.filters.comment = ""
     },
   },
+  watch: {
+    objectiveSearch() {
+      this.showObjectivesDone ?
+          this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch))
+          : this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch) && objective.done === 0)
+    },
+    filters : {
+      handler() {
+        this.displayTimeEntriesToday = this.timeEntriesToday.filter(entry =>
+            (this.filters.project_id === "" || entry.project_id === this.filters.project_id) &&
+            (this.filters.activity_id === "" || entry.activity_id === this.filters.activity_id) &&
+            (this.filters.comment === "" || entry.comment.includes(this.filters.comment))
+        )
+      },
+      deep: true
+    }
+  },
 }
 </script>
 
 <template>
 
-  <div v-if="currentTimeEntry.length > 0" class="current-activity">
+  <div v-if="currentTimeEntry" class="current-activity">
     <h1>En cours :</h1>
     <div class="timer">{{ timer }}</div>
-    <div class="">Nom de l'activité</div>
-    <div class="">Nom du projet</div>
+    <div>{{ currentTimeEntry.project.name }}</div>
+    <div>{{ currentTimeEntry.activity.name }}</div>
     <button @click="stopActivity">STOP</button>
   </div>
 
@@ -281,25 +292,25 @@ export default {
   <div class="activities">
     <h2>Vos activités du jour :</h2>
     <button @click="createTimeEntryData.creating = !createTimeEntryData.creating">Créer une entrée</button>
-
-    <div class="activities-list">
-      <div class="filters">
-        Filtrer la liste :
-        <select v-model="filters.project_id" name="filter-project">
-          <option value="" selected disabled>Projet concerné</option>
-          <option v-for="project in allProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
-        </select>
-        <select v-model="filters.activity_id" name="filter-activity">
-          <option value="" selected disabled>Activité concernée</option>
-          <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{ activity.name }}</option>
-        </select>
-        <input v-model="filters.comment" type="text" name="commentaire"
-               placeholder="Commentaire">
-        <button @click="deleteFilters">Supp les filtres</button>
-      </div>
-      <time-entry @update-entries="getTimeEntriesToday" v-for="entry in timeEntriesToday" :key="entry.id"
+    <div class="filters">
+      Filtrer la liste :
+      <select v-model="filters.project_id" name="filter-project">
+        <option value="" selected disabled>Projet concerné</option>
+        <option v-for="project in allProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
+      </select>
+      <select v-model="filters.activity_id" name="filter-activity">
+        <option value="" selected disabled>Activité concernée</option>
+        <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{ activity.name }}</option>
+      </select>
+      <input v-model="filters.comment" type="text" name="commentaire"
+             placeholder="Commentaire">
+      <button @click="deleteFilters">Supp les filtres</button>
+    </div>
+    <div v-if="displayTimeEntriesToday.length > 0" class="activities-list">
+      <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
                   :entry="entry"/>
     </div>
+    <div v-else>Pas de Time Entry à afficher.</div>
   </div>
 
   <div class="objectives">

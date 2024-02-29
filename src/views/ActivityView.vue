@@ -108,7 +108,7 @@ export default {
   },
   methods: {
     getTimeEntriesToday() {
-      //TODO : plus judicieux de récup celles qui se sont finies ajrd
+      //plus judicieux de récup celles qui se sont finies ajrd
       //pcq là c'est celles qui ont commencé et fini ajrd
       //mais dc on ferait sans les filtres de l'api
       this.$api.get('time-entries?from=' + this.currentDate + '&to=' + this.currentDate).then((resp) => {
@@ -132,8 +132,10 @@ export default {
         }
         if (jours !== 0) {
           this.timer = jours + "j " + heures + "h " + minutes + "m " + secondes + "s"
-        } else {
+        } else if (heures !== 0) {
           this.timer = heures + ":" + minutes + ":" + secondes
+        } else {
+          this.timer = minutes + ":" + secondes
         }
       }
     },
@@ -319,7 +321,7 @@ export default {
     <div class="info"><strong>{{ currentTimeEntry.project.name }}</strong></div>
     <div class="info">{{ currentTimeEntry.activity.name }}</div>
     <div class="timer">{{ timer }}</div>
-    <button @click="stopActivity">Stop<img src="/icons/stop.svg" alt="stop icon"></button>
+    <button class="startStop" @click="stopActivity">Stop<img src="/icons/stop.svg" alt="stop icon"></button>
   </div>
 
   <div v-else class="start-activity">
@@ -342,7 +344,7 @@ export default {
     <div class="select-comment">
       <input v-model="newTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
     </div>
-    <button @click="startActivity">Lancer</button>
+    <button class="startStop" @click="startActivity">Start<img src="/icons/start.svg" alt="stop icon"></button>
   </div>
 
   <pop-up @close="newActivityData.creating = false" id="popupNewActivity" v-if="newActivityData.creating">
@@ -401,7 +403,7 @@ export default {
   padding: 1em;
 }
 
-.current-activity {
+.current-activity, .start-activity {
   width: 50vw;
   margin: auto;
   text-align: center;
@@ -417,25 +419,29 @@ export default {
     font-size: 5em;
     font-weight: 200
   }
+}
 
-  button {
-    border-radius: 100px;
-    border: 1px solid black;
-    padding: .75em 1.5em;
-    text-decoration: none;
-    background-color: rgba(24, 24, 24, 0.5);
-    color: #ECBA07;
-    font-size: 1em;
-    font-weight: 200;
-    display: flex;
-    gap: .5em;
-    align-items: center;
-    margin: auto;
-    &:hover {
-      background-color: rgba(24, 24, 24, 0.75);;
-    }
+h1 {
+  font-size: 2.5em;
+  margin-bottom: .5em;
+}
+
+.startStop {
+  border-radius: 100px;
+  border: 1px solid black;
+  padding: .75em 1.5em;
+  text-decoration: none;
+  background-color: rgba(24, 24, 24, 0.5);
+  color: #ECBA07;
+  font-size: 1em;
+  font-weight: 200;
+  display: flex;
+  gap: .5em;
+  align-items: center;
+  margin: auto;
+  &:hover {
+    background-color: rgba(24, 24, 24, 0.75);;
   }
-
 }
 
 </style>

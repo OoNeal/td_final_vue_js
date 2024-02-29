@@ -244,7 +244,7 @@ export default {
           this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch))
           : this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch) && objective.done === 0)
     },
-    filters : {
+    filters: {
       handler() {
         this.displayTimeEntriesToday = this.timeEntriesToday.filter(entry =>
             (this.filters.project_id === "" || entry.project_id === this.filters.project_id) &&
@@ -274,7 +274,10 @@ export default {
             </select>
             <select v-model="filters.activity_id" name="filter-activity">
               <option value="" selected disabled>Activité concernée</option>
-              <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{ activity.name }}</option>
+              <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{
+                  activity.name
+                }}
+              </option>
             </select>
             <input v-model="filters.comment" type="text" name="commentaire"
                    placeholder="Commentaire">
@@ -313,11 +316,10 @@ export default {
 
 
   <div v-if="currentTimeEntry" class="current-activity">
-    <h1>En cours :</h1>
+    <div class="info"><strong>{{ currentTimeEntry.project.name }}</strong></div>
+    <div class="info">{{ currentTimeEntry.activity.name }}</div>
     <div class="timer">{{ timer }}</div>
-    <div>{{ currentTimeEntry.project.name }}</div>
-    <div>{{ currentTimeEntry.activity.name }}</div>
-    <button @click="stopActivity">STOP</button>
+    <button @click="stopActivity">Stop<img src="/icons/stop.svg" alt="stop icon"></button>
   </div>
 
   <div v-else class="start-activity">
@@ -399,5 +401,41 @@ export default {
   padding: 1em;
 }
 
+.current-activity {
+  width: 50vw;
+  margin: auto;
+  text-align: center;
+  .info {
+    font-size: 1.1em;
+    font-weight: 300;
+    strong {
+      font-weight: 600;
+      color: #ECBA07
+    }
+  }
+  .timer {
+    font-size: 5em;
+    font-weight: 200
+  }
+
+  button {
+    border-radius: 100px;
+    border: 1px solid black;
+    padding: .75em 1.5em;
+    text-decoration: none;
+    background-color: rgba(24, 24, 24, 0.5);
+    color: #ECBA07;
+    font-size: 1em;
+    font-weight: 200;
+    display: flex;
+    gap: .5em;
+    align-items: center;
+    margin: auto;
+    &:hover {
+      background-color: rgba(24, 24, 24, 0.75);;
+    }
+  }
+
+}
 
 </style>

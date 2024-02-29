@@ -33,7 +33,7 @@ export default {
     </div>
     <img src="/icons/plusOrange.svg" alt="plus icon" @click="toggle">
   </div>
-  <section class="sidenav" :class="{visible: visible}">
+  <section v-position="position" class="sidenav" :class="{visible: visible}">
     <div class="sidenav-content">
       <slot name="button"></slot>
       <img src="/icons/cross.svg" alt="cross icon" @click="toggle">
@@ -65,15 +65,26 @@ export default {
   top: 0;
   background-color: black;
   height: 100%;
-  left: -40vw;
   transition : all 0.5s ease;
 }
 
-.sidenav.visible {
+.sidenav.left {
+  left: -40vw;
+}
+
+.sidenav.right {
+  right: -40vw;
+}
+
+.sidenav.right.visible {
+  right: 0;
+  transition : all 0.5s ease;
+}
+
+.sidenav.left.visible {
   left: 0;
   transition : all 0.5s ease;
 }
-
 
 
 </style>

@@ -1,0 +1,79 @@
+<script>
+export default {
+  props: {
+    position: {
+      type: String,
+      required: true,
+      default: "right"
+    }
+  },
+  data() {
+    return {
+      visible: false
+    }
+  },
+  methods: {
+    toggle() {
+      this.visible = !this.visible
+    }
+  },
+  directives: {
+    position(el, binding) {
+      //binding.value === "left" ? el.style.left = "0" : el.style.right = "0"
+      el.classList.add(binding.value)
+    }
+  }
+}
+</script>
+
+<template>
+  <div class="mini-nav" :class="{visible : !visible}">
+    <div>
+      <slot name="button"></slot>
+    </div>
+    <img src="/icons/plusOrange.svg" alt="plus icon" @click="toggle">
+  </div>
+  <section class="sidenav" :class="{visible: visible}">
+    <div class="sidenav-content">
+      <slot name="button"></slot>
+      <img src="/icons/cross.svg" alt="cross icon" @click="toggle">
+      <slot name="content"></slot>
+    </div>
+  </section>
+</template>
+
+<style scoped lang="scss">
+
+.mini-nav {
+  background-color: black;
+  color: white;
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5em;
+  padding: .5em;
+  border-radius: 5px;
+}
+
+.sidenav {
+  width: 40vw;
+  max-width: 40vw;
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  background-color: black;
+  height: 100%;
+  left: -40vw;
+  transition : all 0.5s ease;
+}
+
+.sidenav.visible {
+  left: 0;
+  transition : all 0.5s ease;
+}
+
+
+
+</style>

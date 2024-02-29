@@ -1,11 +1,13 @@
 <script>
 import TimeEntry from "@/components/TimeEntryComponent.vue";
 import PopUp from "@/components/PopUpComponent.vue";
+import SideBar from "@/components/SideBar.vue";
 
 export default {
   components: {
     TimeEntry,
-    PopUp
+    PopUp,
+    SideBar
   },
   data() {
     return {
@@ -91,7 +93,7 @@ export default {
     })
     //on récup l'activité en cours (time entry en cours, qui n'a pas de fin)
     this.$api.get('time-entries?end=').then((resp) => {
-      this.currentTimeEntry = resp.data[0]
+      resp.data[0] ? this.currentTimeEntry = resp.data[0] : null
       //jsp si c bourrin ou pas de faire ça ???????????
       if (this.currentTimeEntry) {
         this.currentTimeEntry.project = this.allProjects.find(project => project.id === this.currentTimeEntry.project_id)
@@ -258,6 +260,58 @@ export default {
 
 <template>
 
+  <div class="sidebars">
+    <side-bar position="left">
+      <template #button>Activités du jour</template>
+      <template #content>
+        <div class="activities">
+          <button @click="createTimeEntryData.creating = !createTimeEntryData.creating">Créer une entrée</button>
+          <div class="filters">
+            Filtrer la liste :
+            <select v-model="filters.project_id" name="filter-project">
+              <option value="" selected disabled>Projet concerné</option>
+              <option v-for="project in allProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
+            </select>
+            <select v-model="filters.activity_id" name="filter-activity">
+              <option value="" selected disabled>Activité concernée</option>
+              <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{ activity.name }}</option>
+            </select>
+            <input v-model="filters.comment" type="text" name="commentaire"
+                   placeholder="Commentaire">
+            <button @click="deleteFilters">Supp les filtres</button>
+          </div>
+          <div v-if="displayTimeEntriesToday.length > 0" class="activities-list">
+            <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
+                        :entry="entry"/>
+          </div>
+          <div v-else>Pas de Time Entry à afficher.</div>
+        </div>
+      </template>
+    </side-bar>
+
+    <side-bar position="right">
+      <template #button>Objectifs</template>
+      <template #content>
+        <div class="objectives">
+          <input type="text" v-model="objectiveSearch" placeholder="Rechercher un objectif">
+          <button @click="newObjectiveData.creating = true">Créer un objectif</button>
+          <div v-if="displayObjectives.length > 0" class="objectives-list">
+            <button v-if="!showObjectivesDone" @click="showAllObjectives">Voir aussi les objectifs atteints</button>
+            <button v-else @click="hideObjectivesDone">Cacher les objectifs atteints</button>
+            <div v-for="objective in displayObjectives" class="objective" :key="objective.id">
+              {{ objective.name }}
+              {{ objective.content }}
+            </div>
+          </div>
+          <div v-else>
+            <p>Vous n'avez aucun objectif.</p>
+          </div>
+        </div>
+      </template>
+    </side-bar>
+  </div>
+
+
   <div v-if="currentTimeEntry" class="current-activity">
     <h1>En cours :</h1>
     <div class="timer">{{ timer }}</div>
@@ -287,47 +341,6 @@ export default {
       <input v-model="newTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
     </div>
     <button @click="startActivity">Lancer</button>
-  </div>
-
-  <div class="activities">
-    <h2>Vos activités du jour :</h2>
-    <button @click="createTimeEntryData.creating = !createTimeEntryData.creating">Créer une entrée</button>
-    <div class="filters">
-      Filtrer la liste :
-      <select v-model="filters.project_id" name="filter-project">
-        <option value="" selected disabled>Projet concerné</option>
-        <option v-for="project in allProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
-      </select>
-      <select v-model="filters.activity_id" name="filter-activity">
-        <option value="" selected disabled>Activité concernée</option>
-        <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{ activity.name }}</option>
-      </select>
-      <input v-model="filters.comment" type="text" name="commentaire"
-             placeholder="Commentaire">
-      <button @click="deleteFilters">Supp les filtres</button>
-    </div>
-    <div v-if="displayTimeEntriesToday.length > 0" class="activities-list">
-      <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
-                  :entry="entry"/>
-    </div>
-    <div v-else>Pas de Time Entry à afficher.</div>
-  </div>
-
-  <div class="objectives">
-    <h2>Vos objectifs : </h2>
-    <input type="text" v-model="objectiveSearch" placeholder="Rechercher un objectif">
-    <button @click="newObjectiveData.creating = true">Créer un objectif</button>
-    <div v-if="displayObjectives.length > 0" class="objectives-list">
-      <button v-if="!showObjectivesDone" @click="showAllObjectives">Voir aussi les objectifs atteints</button>
-      <button v-else @click="hideObjectivesDone">Cacher les objectifs atteints</button>
-      <div v-for="objective in displayObjectives" class="objective" :key="objective.id">
-        {{ objective.name }}
-        {{ objective.content }}
-      </div>
-    </div>
-    <div v-else>
-      <p>Vous n'avez aucun objectif.</p>
-    </div>
   </div>
 
   <pop-up @close="newActivityData.creating = false" id="popupNewActivity" v-if="newActivityData.creating">
@@ -379,21 +392,11 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.current-activity {
-  border: 1px solid red;
-}
-
-.start-activity {
-  border: 1px solid green;
-}
-
-.activities {
-  border: 1px solid blue;
-
-  .create-entry {
-    border: 1px solid orange;
-  }
-
+.sidebars {
+  display: flex;
+  justify-content: space-between;
+  gap: 2em;
+  padding: 1em;
 }
 
 

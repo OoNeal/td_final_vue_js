@@ -147,6 +147,7 @@ export default {
         this.enabledActivities.push(resp.data)
         this.allActivities.push(resp.data)
         this.newActivityData.creating = false
+        this.newTimeEntryData.activity_id = resp.data.id
       }).catch((err) => {
         console.log(err.response.data.errors)
         this.errors.push(err)

@@ -27,11 +27,11 @@ export default {
 </script>
 
 <template>
-  <div class="mini-nav" :class="{visible : !visible}">
+  <div @click="toggle" class="mini-nav" :class="{visible : !visible}">
     <div>
       <slot name="button"></slot>
     </div>
-    <img src="/icons/plusOrange.svg" alt="plus icon" @click="toggle">
+    <img src="/icons/plusOrange.svg" alt="plus icon" >
   </div>
   <section v-position="position" class="sidenav" :class="{visible: visible}">
     <div class="sidenav-content">
@@ -58,8 +58,8 @@ export default {
 }
 
 .sidenav {
-  width: 40vw;
-  max-width: 40vw;
+  width: 35vw;
+  max-width: 25em;
   position: absolute;
   z-index: 1000;
   top: 0;

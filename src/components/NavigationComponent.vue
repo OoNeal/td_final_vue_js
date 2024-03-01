@@ -83,7 +83,7 @@ export default {
       <img @click="stopActivity" src="/icons/stopFull.svg" alt="stop icon">
     </div>
     <div class="hours">
-
+      nb heures travaillées ajrd
     </div>
   </div>
 </template>

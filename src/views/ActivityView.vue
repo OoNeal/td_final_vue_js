@@ -206,6 +206,16 @@ export default {
       this.filters.comment = ""
     },
   },
+  computed: {
+    currentActivityProject() {
+      let project = this.allProjects.find(project => project.id === this.currentTimeEntry.project_id)
+      return project ? project.name : ""
+    },
+    currentActivityActivity() {
+      let activity = this.allActivities.find(activity => activity.id === this.currentTimeEntry.activity_id)
+      return activity ? activity.name : ""
+    },
+  },
   watch: {
     objectiveSearch() {
       this.showObjectivesDone ?
@@ -284,7 +294,8 @@ export default {
 
 
   <div v-if="currentTimeEntry" class="current-activity">
-
+    <div class="info"><strong>{{ currentActivityProject }}</strong></div>
+    <div class="info">{{ currentActivityActivity }}</div>
     <div class="timer">{{ timer }}</div>
     <button class="startStop" @click="stopActivity">Stop<img src="/icons/stop.svg" alt="stop icon"></button>
   </div>

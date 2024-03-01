@@ -4,7 +4,6 @@ import {mapActions, mapState} from 'pinia'
 const currentActivity = {
     data() {
         return {
-            //currentTimeEntry: null,
             timer: null
         }
     },
@@ -54,7 +53,6 @@ const currentActivity = {
             }
         },
         startTimer() {
-            console.log("timer lancé ds mixin")
             window.setInterval(() => {
                 this.calcTimeSince()
             }, 1000)

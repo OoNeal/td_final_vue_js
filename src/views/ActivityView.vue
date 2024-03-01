@@ -2,6 +2,7 @@
 import TimeEntry from "@/components/TimeEntryComponent.vue";
 import PopUp from "@/components/PopUpComponent.vue";
 import SideBar from "@/components/SideBar.vue";
+import currentActivity from "@/mixins/currentActivity.js";
 
 export default {
   components: {
@@ -9,11 +10,10 @@ export default {
     PopUp,
     SideBar
   },
+  mixins: [currentActivity],
   data() {
     return {
       currentDate: new Date().toISOString().slice(0, 10),
-      currentTimeEntry: null,
-      timer: "",
       timeEntriesToday: [],
       displayTimeEntriesToday: [],
 
@@ -82,29 +82,23 @@ export default {
     this.$api.get('projects').then((resp) => {
       this.allProjects = resp.data
       this.enabledProjects = resp.data.filter(project => project.is_enabled === 1);
+    }).catch((err) => {
+      console.log(err)
     })
     this.$api.get('activities').then((resp) => {
       this.allActivities = resp.data
       this.enabledActivities = resp.data.filter(activity => activity.is_enabled === 1);
+    }).catch((err) => {
+      console.log(err)
     })
     this.$api.get('daily-objectives').then((resp) => {
       this.allObjectives = resp.data
       this.displayObjectives = resp.data.filter(objective => objective.done === 0);
-    })
-    //on récup l'activité en cours (time entry en cours, qui n'a pas de fin)
-    this.$api.get('time-entries?end=').then((resp) => {
-      resp.data[0] ? this.currentTimeEntry = resp.data[0] : null
-      //jsp si c bourrin ou pas de faire ça ???????????
-      if (this.currentTimeEntry) {
-        this.currentTimeEntry.project = this.allProjects.find(project => project.id === this.currentTimeEntry.project_id)
-        this.currentTimeEntry.activity = this.allActivities.find(activity => activity.id === this.currentTimeEntry.activity_id)
-      }
+    }).catch((err) => {
+      console.log(err)
     })
     this.getTimeEntriesToday()
-
-    window.setInterval(() => {
-      this.calcTimeSince()
-    }, 1000)
+    this.startTimer()
   },
   methods: {
     getTimeEntriesToday() {
@@ -114,30 +108,9 @@ export default {
       this.$api.get('time-entries?from=' + this.currentDate + '&to=' + this.currentDate).then((resp) => {
         this.timeEntriesToday = resp.data
         this.displayTimeEntriesToday = resp.data
+      }).catch((err) => {
+        console.log(err)
       })
-    },
-    calcTimeSince() {
-      if (this.currentTimeEntry !== null) {
-        const date = new Date(this.currentTimeEntry.start);
-        const difference = new Date().getTime() - date.getTime();
-        const jours = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const heures = Math.floor(difference / (1000 * 60 * 60));
-        let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        let secondes = Math.floor((difference % (1000 * 60)) / 1000);
-        if (secondes < 10) {
-          secondes = '0' + secondes;
-        }
-        if (minutes < 10) {
-          minutes = '0' + minutes;
-        }
-        if (jours !== 0) {
-          this.timer = jours + "j " + heures + "h " + minutes + "m " + secondes + "s"
-        } else if (heures !== 0) {
-          this.timer = heures + ":" + minutes + ":" + secondes
-        } else {
-          this.timer = minutes + ":" + secondes
-        }
-      }
     },
     createActivity() {
       this.$api.post('activities', {
@@ -217,8 +190,8 @@ export default {
           activity_id: this.newTimeEntryData.activity_id,
           comment: this.newTimeEntryData.comment
         }).then((resp) => {
-          this.currentTimeEntry = resp.data
-          this.calcTimeSince()
+          this.setCurrentTimeEntry(resp.data)
+          this.startTimer()
           this.newTimeEntryData.activity_id = ""
           this.newTimeEntryData.project_id = ""
           this.newTimeEntryData.comment = ""
@@ -226,14 +199,6 @@ export default {
           console.log(err.data)
         })
       }
-    },
-    stopActivity() {
-      this.$api.patch(`time-entries/${this.currentTimeEntry.id}/stop`).then((resp) => {
-        this.getTimeEntriesToday()
-        this.currentTimeEntry = null
-      }).catch((err) => {
-        console.log(err.response.data)
-      })
     },
     deleteFilters() {
       this.filters.project_id = ""
@@ -319,8 +284,7 @@ export default {
 
 
   <div v-if="currentTimeEntry" class="current-activity">
-    <div class="info"><strong>{{ currentTimeEntry.project.name }}</strong></div>
-    <div class="info">{{ currentTimeEntry.activity.name }}</div>
+
     <div class="timer">{{ timer }}</div>
     <button class="startStop" @click="stopActivity">Stop<img src="/icons/stop.svg" alt="stop icon"></button>
   </div>
@@ -408,14 +372,17 @@ export default {
   width: 50vw;
   margin: auto;
   text-align: center;
+
   .info {
     font-size: 1.1em;
     font-weight: 300;
+
     strong {
       font-weight: 600;
       color: #ECBA07
     }
   }
+
   .timer {
     font-size: 5em;
     font-weight: 200
@@ -440,6 +407,7 @@ h1 {
   gap: .5em;
   align-items: center;
   margin: auto;
+
   &:hover {
     background-color: rgba(24, 24, 24, 0.75);;
   }

@@ -1,8 +1,7 @@
 <script>
-import {mapActions} from 'pinia'
-import {useAuthStore} from '@/stores/Auth.js'
-
+import currentActivity from "@/mixins/currentActivity.js";
 export default {
+  mixins: [currentActivity],
   props: {
     connected: {
       type: Boolean,
@@ -12,17 +11,34 @@ export default {
   },
   data() {
     return {
-      user: ""
+      user: "",
+      allObjectives: [],
+      objectivesDone: []
     }
+  },
+  computed: {
+    isOnActivity() {
+      return this.$route.path === "/"
+    },
   },
   created() {
     if (this.connected) {
-      this.$api.get('profile')
-          .then((response) => {
-            this.user = response.data.name
-          })
+      this.$api.get('profile').then((resp) => {
+        this.user = resp.data.name
+      }).catch((err) => {
+        console.log(err)
+      })
+      this.$api.get('daily-objectives').then((resp) => {
+        //compteurs d’objectifs atteints sur le total ouvert aujourd’hui
+        this.allObjectives = resp.data
+        this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
+      }).catch((err) => {
+        console.log(err)
+      })
+      this.getCurrentActivity()
     }
   }
+
 }
 
 </script>
@@ -58,8 +74,17 @@ export default {
     </RouterLink>
   </header>
 
-  <div class="current-activity" v-if="connected">
+  <div class="infos" v-if="connected">
+    <div class="objectives">
+      {{ objectivesDone.length }} / {{ allObjectives.length }}
+    </div>
+    <div v-if="!isOnActivity && timer" class="current-activity">
+      <div>{{ timer }}</div>
+      <img @click="stopActivity" src="/icons/stopFull.svg" alt="stop icon">
+    </div>
+    <div class="hours">
 
+    </div>
   </div>
 </template>
 

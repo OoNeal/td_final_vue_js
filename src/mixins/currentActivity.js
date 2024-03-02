@@ -8,7 +8,7 @@ const currentActivity = {
         }
     },
     computed: {
-        ...mapState(useCurrentActivityStore, ['currentTimeEntry'])
+        ...mapState(useCurrentActivityStore, ['currentTimeEntry']),
     },
     methods: {
         ...mapActions(useCurrentActivityStore, ['setCurrentTimeEntry', 'deleteCurrentTimeEntry']),

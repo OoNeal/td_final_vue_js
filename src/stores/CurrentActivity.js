@@ -21,6 +21,6 @@ export const useCurrentActivityStore = defineStore('currentActivity', {
         },
         deleteCurrentTimeEntry() {
             this.currentTimeEntry = null
-        },
+        }
     }
 })

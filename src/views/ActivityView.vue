@@ -226,6 +226,10 @@ export default {
         )
       },
       deep: true
+    },
+    currentTimeEntry() {
+      //quand acti arrêtée (cf méthode ds le mixin), on refresh les timeEntries
+      !this.currentTimeEntry ? this.getTimeEntriesToday() : null
     }
   },
 }

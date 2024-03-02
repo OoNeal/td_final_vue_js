@@ -74,8 +74,7 @@ export default {
   <div class="entry">
     <div>{{project}}</div>
     <div v-color="color">{{activity}}</div>
-
-    <div>{{entry.start}} - {{entry.end}}</div>
+    <div>{{ getHours(entry.start) }} - {{ getHours(entry.end) }}</div>
     <div>{{entry.comment}}</div>
     <img @click="changeEntry()" src="/icons/edit.svg" alt="edit icon">
     <img @click="deleteEntry()" src="/icons/delete.svg" alt="trash icon">

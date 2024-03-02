@@ -1,7 +1,5 @@
 <script>
 import currentActivity from "@/mixins/currentActivity.js";
-import {useAllObjectivesStore} from "@/stores/AllObjectives.js";
-import {mapActions, mapState} from 'pinia'
 
 export default {
   mixins: [currentActivity],
@@ -15,6 +13,7 @@ export default {
   data() {
     return {
       user: "",
+      allObjectives: [],
       objectivesDone: []
     }
   },
@@ -22,10 +21,6 @@ export default {
     isOnActivity() {
       return this.$route.path === "/"
     },
-    ...mapState(useAllObjectivesStore, ['allObjectives']),
-  },
-  methods: {
-    ...mapActions(useAllObjectivesStore, ['setObjectives'])
   },
   created() {
     if (this.connected) {
@@ -36,7 +31,8 @@ export default {
       })
       this.$api.get('daily-objectives').then((resp) => {
         //le nombre d’objectifs atteints aujourd’hui (sur le nombre d’objectif total)
-        this.setObjectives(resp.data)
+        this.allObjectives = resp.data
+        this.allObjectives.sort((a, b) => new Date(b.date) - new Date(a.date))
         this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
       }).catch((err) => {
         console.log(err)

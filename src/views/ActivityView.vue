@@ -3,8 +3,6 @@ import TimeEntry from "@/components/TimeEntryComponent.vue";
 import PopUp from "@/components/PopUpComponent.vue";
 import SideBar from "@/components/SideBar.vue";
 import currentActivity from "@/mixins/currentActivity.js";
-import {useAllObjectivesStore} from "@/stores/AllObjectives.js";
-import {mapActions, mapState} from 'pinia'
 
 export default {
   components: {
@@ -15,7 +13,6 @@ export default {
   mixins: [currentActivity],
   data() {
     return {
-      currentDate: new Date().toISOString().slice(0, 10),
       timeEntriesToday: [],
       displayTimeEntriesToday: [],
 
@@ -28,6 +25,7 @@ export default {
       enabledProjects: [],
 
       //que les objectifs qu'on affiche (on filtre allObjectives pour déterminer displayObjectives)
+      allObjectives: [],
       displayObjectives: [],
       showObjectivesDone: false,
       objectiveSearch: "",
@@ -92,20 +90,21 @@ export default {
     }).catch((err) => {
       console.log(err)
     })
-    //les objectifs ont déjà été récup ds le header et mis dans le store
-    this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+    this.$api.get('daily-objectives').then((resp) => {
+      this.allObjectives = resp.data
+      this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+    }).catch((err) => {
+      console.log(err)
+    })
     this.getTimeEntriesToday()
     this.startTimer()
   },
   methods: {
-    ...mapActions(useAllObjectivesStore, ['addObjective']),
     getTimeEntriesToday() {
-      //plus judicieux de récup celles qui se sont finies ajrd
-      //pcq là c'est celles qui ont commencé et fini ajrd
-      //mais dc on ferait sans les filtres de l'api
-      this.$api.get('time-entries?from=' + this.currentDate + '&to=' + this.currentDate).then((resp) => {
-        this.timeEntriesToday = resp.data
-        this.displayTimeEntriesToday = resp.data
+      this.$api.get('time-entries').then((resp) => {
+        this.timeEntriesToday = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
+        console.log(this.timeEntriesToday)
+        this.displayTimeEntriesToday = this.timeEntriesToday
       }).catch((err) => {
         console.log(err)
       })
@@ -142,7 +141,7 @@ export default {
         content: this.newObjectiveData.description
       }).then((resp) => {
         this.newObjectiveData.creating = false
-        this.addObjective(resp.data)
+        this.allObjectives.unshift(resp.data)
         this.displayObjectives.unshift(resp.data)
       }).catch((err) => {
         console.log(err.response.data.errors)
@@ -168,7 +167,6 @@ export default {
           end: this.createTimeEntryData.end.replace("T", " ")
         }).then((resp) => {
           // TODO : push dans activitiesToday si la date de début et de fin c ajrd
-          console.log("createTimeEntry", resp.data)
           this.createTimeEntryData.activity_id = ""
           this.createTimeEntryData.project_id = ""
           this.createTimeEntryData.comment = ""
@@ -204,7 +202,6 @@ export default {
     },
   },
   computed: {
-    ...mapState(useAllObjectivesStore, ['allObjectives']),
     currentActivityProject() {
       let project = this.allProjects.find(project => project.id === this.currentTimeEntry.project_id)
       return project ? project.name : ""

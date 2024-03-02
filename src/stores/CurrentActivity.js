@@ -7,7 +7,7 @@ export const useCurrentActivityStore = defineStore('currentActivity', {
         }
     },
     persist: {
-        enabled: true,
+        enabled: false,
         strategies:
             [
                 {

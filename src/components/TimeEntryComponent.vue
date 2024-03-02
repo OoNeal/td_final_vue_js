@@ -36,8 +36,6 @@ export default {
     },
     deleteEntry() {
       this.$api.delete('time-entries/' + this.entry.id).then(() => {
-        //ça supp que au reload et pas direct
-        //this.entries.filter(entry => entry.id !== this.entry.id);
         this.$emit('update-entries')
       }).catch((err) => {
         console.log(err)
@@ -76,7 +74,8 @@ export default {
   <div class="entry">
     <div>{{project}}</div>
     <div v-color="color">{{activity}}</div>
-    <div>{{ getHours(entry.start) }} - {{ getHours(entry.end) }}</div>
+
+    <div>{{entry.start}} - {{entry.end}}</div>
     <div>{{entry.comment}}</div>
     <img @click="changeEntry()" src="/icons/edit.svg" alt="edit icon">
     <img @click="deleteEntry()" src="/icons/delete.svg" alt="trash icon">

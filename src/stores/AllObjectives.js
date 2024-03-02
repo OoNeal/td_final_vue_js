@@ -7,7 +7,7 @@ export const useAllObjectivesStore = defineStore('allObjectives', {
         }
     },
     persist: {
-        enabled: true,
+        enabled: false,
         strategies:
             [
                 {

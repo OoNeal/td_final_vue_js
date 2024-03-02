@@ -29,7 +29,7 @@ export default {
         console.log(err)
       })
       this.$api.get('daily-objectives').then((resp) => {
-        //compteurs d’objectifs atteints sur le total ouvert aujourd’hui
+        //le nombre d’objectifs atteints aujourd’hui (sur le nombre d’objectif total)
         this.allObjectives = resp.data
         this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
       }).catch((err) => {
@@ -37,8 +37,13 @@ export default {
       })
       this.getCurrentActivity()
     }
+  },
+  watch: {
+    currentTimeEntry() {
+      //this.getCurrentActivity()
+      this.currentTimeEntry ? this.startTimer() : this.timer = null
+    }
   }
-
 }
 
 </script>

@@ -16,7 +16,7 @@ const currentActivity = {
             this.$api.get('time-entries?end=').then((resp) => {
                 //call API
                 //on set dans le store et on lance le timer si il y a une time entry en cours
-                resp.data[0] ? (this.setCurrentTimeEntry(resp.data[0]), this.startTimer()) : null
+                resp.data[0] ? (this.setCurrentTimeEntry(resp.data[0])) : null
             }).catch((err) => {
                 console.log(err)
             })

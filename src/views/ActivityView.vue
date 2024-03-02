@@ -189,8 +189,8 @@ export default {
           project_id: this.newTimeEntryData.project_id,
           activity_id: this.newTimeEntryData.activity_id,
           comment: this.newTimeEntryData.comment
-        }).then((resp) => {
-          this.setCurrentTimeEntry(resp.data)
+        }).then(() => {
+          this.getCurrentActivity()
           this.startTimer()
           this.newTimeEntryData.activity_id = ""
           this.newTimeEntryData.project_id = ""

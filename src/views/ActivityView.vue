@@ -103,7 +103,6 @@ export default {
     getTimeEntriesToday() {
       this.$api.get('time-entries').then((resp) => {
         this.timeEntriesToday = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
-        console.log(this.timeEntriesToday)
         this.displayTimeEntriesToday = this.timeEntriesToday
       }).catch((err) => {
         console.log(err)

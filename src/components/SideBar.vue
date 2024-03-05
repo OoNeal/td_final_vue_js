@@ -31,7 +31,7 @@ export default {
     <div>
       <slot name="button"></slot>
     </div>
-    <img src="/icons/plusOrange.svg" alt="plus icon" >
+    <img src="/icons/plusOrange.svg" alt="plus icon">
   </div>
   <section v-position="position" class="sidenav" :class="{visible: visible}">
     <div class="top">
@@ -57,6 +57,10 @@ export default {
   gap: .5em;
   padding: .5em;
   border-radius: 5px;
+
+  img {
+    height: 1em;
+  }
 }
 
 .sidenav {
@@ -67,15 +71,17 @@ export default {
   top: 0;
   background-color: black;
   height: 100%;
-  transition : all 0.5s ease;
+  transition: all 0.5s ease;
   overflow-y: scroll;
   overflow-x: hidden;
+
   .top {
     position: fixed;
     background-color: black;
     z-index: 10;
     padding: 1em;
   }
+
   .sidenav-content {
     padding-top: 5em;
   }
@@ -91,12 +97,12 @@ export default {
 
 .sidenav.right.visible {
   right: 0;
-  transition : all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 .sidenav.left.visible {
   left: 0;
-  transition : all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 

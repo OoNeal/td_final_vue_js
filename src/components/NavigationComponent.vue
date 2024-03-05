@@ -15,6 +15,7 @@ export default {
       user: "",
       allObjectives: [],
       objectivesDone: [],
+      timeEntries: [],
       timeWorked: 0,
     }
   },
@@ -22,6 +23,36 @@ export default {
     isOnActivity() {
       return this.$route.path === "/"
     },
+  },
+  methods: {
+    calcHoursWorked() {
+      const today = new Date().toISOString().slice(0, 10);
+      let totalMillisecondsWorked = 0;
+      this.timeEntries.forEach(entry => {
+        const start = new Date(entry.start);
+        const end = new Date(entry.end);
+        if (start.getDate() === end.getDate()) {
+          totalMillisecondsWorked += end.getTime() - start.getTime();
+        } else {
+          const midnightToday = new Date(today).setHours(0, 0, 0, 0);
+          totalMillisecondsWorked += end.getTime() - midnightToday;
+        }
+      })
+      const hoursWorked = Math.floor(totalMillisecondsWorked / (1000 * 60 * 60));
+      const minutesWorked = Math.floor((totalMillisecondsWorked % (1000 * 60 * 60)) / (1000 * 60));
+
+      hoursWorked ? this.timeWorked = hoursWorked + "h" + minutesWorked : this.timeWorked = minutesWorked + "min";
+    },
+    getTimeEntries() {
+      this.$api.get('time-entries').then((resp) => {
+        //je fais la même dans activity view donc à factoriser ??? mais ds le store c bad chiant
+        //il faut prendre l'activité actuelle aussi ?
+        this.timeEntries = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
+        this.calcHoursWorked()
+      }).catch((err) => {
+        console.log(err)
+      })
+    }
   },
   created() {
     if (this.connected) {
@@ -41,37 +72,13 @@ export default {
       })
 
       this.getCurrentActivity()
-
-      this.$api.get('time-entries').then((resp) => {
-        //je fais la même dans activity view donc à factoriser ??? mais ds le store c bad chiant
-        //il faut prendre l'activité actuelle aussi ?
-        const today = new Date().toISOString().slice(0, 10);
-        const timeEntriesToday = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === today);
-        let totalMillisecondsWorked = 0;
-        timeEntriesToday.forEach(entry => {
-          const start = new Date(entry.start);
-          const end = new Date(entry.end);
-          if (start.getDate() === end.getDate()) {
-            totalMillisecondsWorked += end.getTime() - start.getTime();
-          } else {
-            const midnightToday = new Date(today).setHours(0, 0, 0, 0);
-            totalMillisecondsWorked += end.getTime() - midnightToday;
-          }
-        })
-        const hoursWorked = Math.floor(totalMillisecondsWorked / (1000 * 60 * 60));
-        const minutesWorked = Math.floor((totalMillisecondsWorked % (1000 * 60 * 60)) / (1000 * 60));
-
-        hoursWorked ? this.timeWorked = hoursWorked + "h" + minutesWorked : this.timeWorked = minutesWorked + "min";
-        console.log("Temps travaillé aujourd'hui:", hoursWorked, "heures et", minutesWorked, "minutes");
-      }).catch((err) => {
-        console.log(err)
-      })
+      this.getTimeEntries()
     }
   },
   watch: {
     currentTimeEntry() {
       //this.getCurrentActivity()
-      this.currentTimeEntry ? this.startTimer() : this.timer = null
+      this.currentTimeEntry ? this.startTimer() : (this.timer = null, this.timeEntries = this.timeEntries.push(this.currentTimeEntry), this.calcHoursWorked())
     }
   }
 }
@@ -195,6 +202,7 @@ a {
   align-items: center;
   justify-content: center;
   font-size: 1.5em;
+
   img {
     height: 1em;
   }

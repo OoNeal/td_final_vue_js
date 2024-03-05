@@ -305,7 +305,8 @@ export default {
         <option value="" selected disabled>Projet concerné</option>
         <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
       </select>
-      <button v-if="!newProjectData.creating" @click="newProjectData.creating = true">Nouveau projet</button>
+      <img src="/icons/plusGrey.svg" alt="plus icon" v-if="!newProjectData.creating"
+           @click="newProjectData.creating = true">
     </div>
     <div class="select-activity">
       <select v-model="newTimeEntryData.activity_id" name="project">
@@ -313,7 +314,8 @@ export default {
         <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{ activity.name }}
         </option>
       </select>
-      <button v-if="!newActivityData.creating" @click="newActivityData.creating = true">Nouvelle activité</button>
+      <img src="/icons/plusGrey.svg" alt="plus icon" v-if="!newActivityData.creating"
+           @click="newActivityData.creating = true">
     </div>
     <div class="select-comment">
       <input v-model="newTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
@@ -381,26 +383,52 @@ export default {
   width: 50vw;
   margin: auto;
   text-align: center;
+}
 
-  .info {
-    font-size: 1.1em;
-    font-weight: 300;
+.info {
+  font-size: 1.1em;
+  font-weight: 300;
 
-    strong {
-      font-weight: 600;
-      color: #ECBA07
-    }
+  strong {
+    font-weight: 600;
+    color: #ECBA07
   }
+}
 
-  .timer {
-    font-size: 5em;
-    font-weight: 200
-  }
+.timer {
+  font-size: 5em;
+  font-weight: 200
 }
 
 h1 {
   font-size: 2.5em;
   margin-bottom: .5em;
+}
+
+.select-project, .select-activity, .select-comment {
+  display: flex;
+  justify-content: center;
+  gap: .5em;
+  align-items: center;
+  margin: .5em
+}
+
+select, input {
+  padding: .5em 1em;
+  font-size: 1em;
+  font-family: inherit;
+  border-radius: 10px;
+  border: 1px solid black;
+  color: #8c8c8c;
+  background: #1C1C1C ;
+  appearance: none;
+  width: 70%
+}
+
+select {
+  background-image : url('/icons/arrow.svg');
+  background-position: calc(100% - 0.75rem) center;
+  background-repeat : no-repeat;
 }
 
 .startStop {
@@ -416,7 +444,8 @@ h1 {
   gap: .5em;
   align-items: center;
   margin: auto;
-
+  font-family: inherit;
+  margin-top: 2em;
   &:hover {
     background-color: rgba(24, 24, 24, 0.75);;
   }

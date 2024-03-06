@@ -443,9 +443,9 @@ select {
   display: flex;
   gap: .5em;
   align-items: center;
-  margin: auto;
   font-family: inherit;
-  margin-top: 2em;
+  margin: 2em auto auto;
+
   &:hover {
     background-color: rgba(24, 24, 24, 0.75);;
   }

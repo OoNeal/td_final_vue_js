@@ -1,176 +1,152 @@
-<template>
-  <nav>
-    <div class="upperNav">
-      <button @click="toggleTimer">Commencer son temps de travail: {{ formatTime(duration) }}</button>
-      <p>nombres d'objectifs atteints: </p>
-      <routerLink to="/activity">Voir les activités</routerLink>
-      <routerLink to="/project">Voir les projets</routerLink>
-      <p @click="logout()">Logout</p>
-    </div>
-
-    <div class="bottomNav">
-
-      <p>Activités en cours: </p>
-      <button type="button" aria-label="stop"><img src="../assets/img/Stop_button.png">Stopper l'activité en cours
-      </button>
-      <routerLink to="/settings">Paramètres globaux</routerLink>
-      <routerLink to="/reporting">Voir les statistiques</routerLink>
-
-    </div>
-  </nav>
-</template>
-
 <script>
-import { mapActions } from 'pinia'
-import { useAuthStore } from '@/stores/Auth.js'
+import currentActivity from "@/mixins/currentActivity.js";
 
 export default {
-  data() {
-    return {
-      timerRunning: false,
-      startTime: null,
-      duration: 0,
-      timerInterval: null
-
+  mixins: [currentActivity],
+  props: {
+    connected: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
-  methods: {
-    ...mapActions(useAuthStore, ['clearApiKey']),
-    logout() {
-      this.clearApiKey()
-      this.$router.push('/auth/login')
-    },
-    toggleTimer() {
-      if (this.timerRunning) {
-        this.stopTimer()
-      } else {
-        this.startTimer()
-      }
-    },
-    startTimer() {
-      this.timerRunning = true
-      this.startTime = Date.now()
-      this.timerInterval = setInterval(function() {
-        this.duration = Date.now() - this.startTime
-      }.bind(this), 1000)
-    },
-    stopTimer() {
-      this.timerRunning = false
-      clearInterval(this.timerInterval)
-    },
-    formatTime(milliseconds) {
-      const seconds = Math.floor(milliseconds / 1000)
-      const minutes = Math.floor(seconds / 60)
-      const hours = Math.floor(minutes / 60)
-
-      const formattedTime =
-        String(hours).padStart(2, '0') +
-        ':' +
-        String(minutes % 60).padStart(2, '0') +
-        ':' +
-        String(seconds % 60).padStart(2, '0')
-
-      return formattedTime
+  data() {
+    return {
+      user: "",
+      allObjectives: [],
+      objectivesDone: []
     }
-
+  },
+  computed: {
+    isOnActivity() {
+      return this.$route.path === "/"
+    },
+  },
+  created() {
+    if (this.connected) {
+      this.$api.get('profile').then((resp) => {
+        this.user = resp.data.name
+      }).catch((err) => {
+        console.log(err)
+      })
+      this.$api.get('daily-objectives').then((resp) => {
+        //le nombre d’objectifs atteints aujourd’hui (sur le nombre d’objectif total)
+        this.allObjectives = resp.data
+        this.allObjectives.sort((a, b) => new Date(b.date) - new Date(a.date))
+        this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
+      }).catch((err) => {
+        console.log(err)
+      })
+      this.getCurrentActivity()
+    }
+  },
+  watch: {
+    currentTimeEntry() {
+      //this.getCurrentActivity()
+      this.currentTimeEntry ? this.startTimer() : this.timer = null
+    }
   }
 }
 
 </script>
 
-<style scoped>
-p {
-  color: #FFFFFF;
+<template>
+  <header v-if="!connected">
+    <div class="logo">
+      <div>TIME</div>
+      <div>LY</div>
+    </div>
+    <div class="greetings">
+      Bienvenue sur Timely !
+    </div>
+    <nav>
+      <RouterLink to="/auth/login">Se connecter</RouterLink>
+      <RouterLink to="/auth/register">S'inscrire</RouterLink>
+    </nav>
+  </header>
+
+  <header v-if="connected">
+    <div class="logo">
+      <div>TIME</div>
+      <div>LY</div>
+    </div>
+    <nav>
+      <RouterLink to="/">Activité</RouterLink>
+      <RouterLink to="/reporting">Statistiques</RouterLink>
+      <RouterLink to="/settings">Paramètres</RouterLink>
+    </nav>
+    <RouterLink class="profile" to="/settings/profile">
+      <div>{{ user }}</div>
+      <img src="/icons/user.svg" alt="user icon">
+    </RouterLink>
+  </header>
+
+  <div class="infos" v-if="connected">
+    <div class="objectives">
+      {{ objectivesDone.length }} / {{ allObjectives.length }}
+    </div>
+    <div v-if="!isOnActivity && timer" class="current-activity">
+      <div>{{ timer }}</div>
+      <img @click="stopActivity" src="/icons/stopFull.svg" alt="stop icon">
+    </div>
+    <div class="hours">
+      nb heures travaillées ajrd
+    </div>
+  </div>
+</template>
+
+
+<style scoped lang="scss">
+
+header {
+  background-color: #1C1C1C;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  padding: 1em;
 }
+
+.logo {
+  display: flex;
+  font-size: 1.5em;
+  font-weight: 500;
+
+  div:nth-child(1) {
+    color: #ECBA07;
+  }
+}
+
 
 nav {
   display: flex;
-  flex-direction: column;
-
-}
-
-
-.upperNav {
-  display: flex;
-  justify-content: space-around;
   align-items: center;
-  background-color: #02020A;
-  height: 50px;
+  gap: 2em;
 }
 
-.upperNav p {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
-  font-size: 20px;
-}
-
-
-.upperNav a {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
-  font-size: 20px;
+a {
+  color: white;
   text-decoration: none;
-  color: #FFFFFF;
-  margin-left: 15px;
 }
 
-.upperNav button {
-  font-family: 'Poppins', sans-serif;
-  background-color: #ffffff;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 20px;
-  text-transform: uppercase;
-}
-
-
-.bottomNav {
+.profile {
   display: flex;
-  justify-content: space-around;
+  gap: .5em;
   align-items: center;
-  background-color: #E1E2EF;
-  height: 100px;
+
+  img {
+    height: 1.5em;
+  }
 }
 
-.bottomNav p {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
-  font-size: 20px;
-  color: #333;
+.greetings {
+  color: #ECBA07;
 }
 
+.router-link-active {
+  color: #ECBA07;
+  font-weight: 500;
 
-.bottomNav button {
-  font-family: 'Poppins', sans-serif;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 20px;
-  text-align: center;
-  vertical-align: middle;
-}
-
-
-.bottomNav a {
-  text-decoration: none;
-  color: #333;
-  margin-left: 15px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
-  font-size: 20px;
-}
-
-img {
-  width: 25px;
-  height: 25px;
-  text-align: center;
-  vertical-align: middle;
-  padding: 2px;
 }
 
 </style>

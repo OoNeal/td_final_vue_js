@@ -1,7 +1,7 @@
 <script>
 
 export default {
-  emits: ['updateEntries'],
+  emits: ['update-entries'],
   props: {
     entry:{
       type: Object,
@@ -19,10 +19,14 @@ export default {
   created() {
     this.$api.get(`projects/${this.entry.project_id}`).then((resp) => {
       this.project = resp.data.name
+    }).catch((err) => {
+      console.log(err)
     })
     this.$api.get(`activities/${this.entry.activity_id}`).then((resp) => {
       this.activity = resp.data.name
       this.color = resp.data.color
+    }).catch((err) => {
+      console.log(err)
     })
   },
   methods : {
@@ -30,17 +34,16 @@ export default {
       let time = date.split(" ")[1]
       return time.split(":")[0] + "h" + time.split(":")[1]
     },
-    deleteEntry(entryId) {
-      this.$api.delete('time-entries/' + entryId).then(() => {
-        //ça supp que au reload et pas direct
-        this.entries.filter(entry => entry.id !== entryId);
+    deleteEntry() {
+      this.$api.delete('time-entries/' + this.entry.id).then(() => {
         this.$emit('update-entries')
+      }).catch((err) => {
+        console.log(err)
       })
     },
     changeEntry() {
-      this.newEntry = this.entry;
+      this.newEntry = {...this.entry};
       this.newEntry.beingChanged = true
-      this.$emit('update-entries')
     },
     editEntry() {
       this.$api.put(`time-entries/${this.entry.id}`, {
@@ -71,10 +74,10 @@ export default {
   <div class="entry">
     <div>{{project}}</div>
     <div v-color="color">{{activity}}</div>
-    <div>{{getHours(entry.start)}} - {{getHours(entry.end)}}</div>
+    <div>{{ getHours(entry.start) }} - {{ getHours(entry.end) }}</div>
     <div>{{entry.comment}}</div>
-    <img @click="changeEntry()" src="@/assets/icons/edit.svg" alt="edit icon">
-    <img @click="deleteEntry()" src="@/assets/icons/delete.svg" alt="trash icon">
+    <img @click="changeEntry()" src="/icons/edit.svg" alt="edit icon">
+    <img @click="deleteEntry()" src="/icons/delete.svg" alt="trash icon">
   </div>
 
   <div class="change-entry" v-if="newEntry !== null">

@@ -14,7 +14,8 @@ export default {
 </script>
 
 <template>
-  <Navigation v-if="useAuthStore().apiKey"/>
+  <Navigation v-if="useAuthStore().apiKey" connected/>
+  <Navigation v-else/>
   <RouterView />
 </template>
 

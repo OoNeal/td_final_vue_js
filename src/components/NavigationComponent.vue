@@ -77,8 +77,7 @@ export default {
   },
   watch: {
     currentTimeEntry() {
-      //this.getCurrentActivity()
-      this.currentTimeEntry ? this.startTimer() : (this.timer = null, this.timeEntries = this.timeEntries.push(this.currentTimeEntry), this.calcHoursWorked())
+      this.currentTimeEntry ? this.startTimer() : (this.timer = null, this.getTimeEntries())
     }
   }
 }
@@ -138,7 +137,6 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: white;
   padding: 1em;
 }
 
@@ -160,7 +158,7 @@ nav {
 }
 
 a {
-  color: white;
+  color: inherit;
   text-decoration: none;
 }
 
@@ -190,7 +188,6 @@ a {
   padding: 1em;
   padding-top: .5em;
   background-color: #1C1C1C;
-  color: white;
   font-size: .9em;
   gap: 1em;
 
@@ -204,7 +201,7 @@ a {
   font-size: 1.5em;
 
   img {
-    height: 1em;
+    height: .7em;
   }
 }
 

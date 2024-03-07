@@ -1,5 +1,6 @@
 <script>
 import TimeEntry from "@/components/TimeEntryComponent.vue";
+import Objective from "@/components/ObjectiveComponent.vue";
 import PopUp from "@/components/PopUpComponent.vue";
 import SideBar from "@/components/SideBarComponent.vue";
 import currentActivity from "@/mixins/currentActivity.js";
@@ -8,7 +9,8 @@ export default {
   components: {
     TimeEntry,
     PopUp,
-    SideBar
+    SideBar,
+    Objective
   },
   mixins: [currentActivity],
   data() {
@@ -65,7 +67,7 @@ export default {
       newObjectiveData: {
         creating: false,
         name: "",
-        description: ""
+        content: ""
       },
 
       //filtres sur les timeEntries
@@ -90,12 +92,7 @@ export default {
     }).catch((err) => {
       console.log(err)
     })
-    this.$api.get('daily-objectives').then((resp) => {
-      this.allObjectives = resp.data
-      this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
-    }).catch((err) => {
-      console.log(err)
-    })
+    this.getObjectives()
     this.getTimeEntriesToday()
     this.startTimer()
   },
@@ -104,6 +101,15 @@ export default {
       this.$api.get('time-entries').then((resp) => {
         this.timeEntriesToday = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
         this.displayTimeEntriesToday = this.timeEntriesToday
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+    getObjectives() {
+      this.$api.get('daily-objectives').then((resp) => {
+        this.allObjectives = resp.data.sort((a, b) => new Date(b.date) - new Date(a.date));        this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+        //peut mieux faire mais flemme
+        this.hideObjectivesDone()
       }).catch((err) => {
         console.log(err)
       })
@@ -137,7 +143,7 @@ export default {
     createObjective() {
       this.$api.post('daily-objectives', {
         name: this.newObjectiveData.name,
-        content: this.newObjectiveData.description
+        content: this.newObjectiveData.content
       }).then((resp) => {
         this.newObjectiveData.creating = false
         this.allObjectives.unshift(resp.data)
@@ -288,10 +294,7 @@ export default {
           </div>
           <div v-if="displayObjectives.length > 0" class="objectives-list">
             <div class="title">Liste des objectifs :</div>
-            <div v-for="objective in displayObjectives" class="objective" :key="objective.id">
-              {{ objective.name }}
-              {{ objective.content }}
-            </div>
+            <objective @update-objectives="getObjectives" :objective="objective" v-for="objective in displayObjectives" class="objective" :key="objective.id"/>
           </div>
           <div v-else>
             <p>Vous n'avez aucun objectif.</p>

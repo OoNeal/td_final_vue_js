@@ -218,7 +218,6 @@ export default {
     },
     filters: {
       handler() {
-        console.log(this.filters)
         this.displayTimeEntriesToday = this.timeEntriesToday.filter(entry =>
             (this.filters.project_id === "" || entry.project_id === this.filters.project_id) &&
             (this.filters.activity_id === "" || entry.activity_id === this.filters.activity_id) &&

@@ -96,22 +96,34 @@ export default {
       <div class="project">{{ project }}</div>
       <div class="activity" v-color="color">{{ activity }}</div>
     </div>
-    <div class="infos-1">
+    <div v-if="!newEntry" class="infos-1">
       <div>{{ getHours(entry.start) }} - {{ getHours(entry.end) }} ({{ calcHoursBetween }})</div>
       <div class="actions-icons">
         <img @click="changeEntry()" src="/icons/editOrange.svg" alt="edit icon">
         <img @click="deleteEntry()" src="/icons/deleteOrange.svg" alt="trash icon">
       </div>
     </div>
-    <div class="infos-2">{{ entry.comment }}</div>
+    <div v-if="!newEntry" class="infos-2">{{ entry.comment }}</div>
+
+    <div class="change-entry" v-else>
+      <div class="input">
+        <label for="start">Début :</label>
+        <input name="start" type="datetime-local" v-model="newEntry.start">
+      </div>
+      <div class="input">
+        <label for="end">Fin :</label>
+        <input name="end" type="datetime-local" v-model="newEntry.end">
+      </div>
+      <label for="comment">Commentaire :</label>
+      <input name="comment" type="text" v-model="newEntry.comment">
+
+      <div class="buttons">
+        <button @click="newEntry = null">Annuler</button>
+        <button @click="editEntry()">Valider</button>
+      </div>
+    </div>
   </div>
 
-  <div class="change-entry" v-if="newEntry !== null">
-    <input type="datetime-local" v-model="newEntry.start">
-    <input type="datetime-local" v-model="newEntry.end">
-    <input type="text" v-model="newEntry.comment">
-    <button @click="editEntry()">Valider</button>
-  </div>
 </template>
 
 <style scoped lang="scss">
@@ -121,7 +133,7 @@ export default {
   color: #D4DFD8;
   background-color: #323333;
   padding: .5em 1em;
-  margin-top:1em;
+  margin-top: 1em;
 }
 
 .top {
@@ -138,7 +150,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   gap: 1em;
-  font-weight: 300;
+  font-weight: 350;
   margin-top: .5em;
   margin-bottom: .5em;
   color: darken(#D4DFD8, 10%);
@@ -150,17 +162,88 @@ export default {
 
   img {
     height: 1.3em;
+    cursor: pointer;
   }
 }
 
 .infos-2 {
-  font-weight: 100;
+  font-weight: 200;
   color: darken(#D4DFD8, 20%);
 }
 
 
 .change-entry {
-  border: 2px solid fuchsia;
+  //background-color: blue;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 1em;
+  margin-bottom: .5em;
+  padding-left: 5%;
+  padding-right: 5%;
+
+  label {
+    font-weight: 550;
+  }
+
+  input {
+    cursor: pointer;
+    padding: .5em 1em;
+    font-family: inherit;
+    border-radius: 10px;
+    border: none;
+    background-color: unset;
+    color: #D4DFD8;
+    font-size: .9em;
+    text-overflow: ellipsis;
+    font-weight: 300;
+
+
+    &[type=text] {
+      cursor: text;
+      background-color: darken(#323333, 5%);
+      border: 1px solid #636765;
+      width: inherit;
+      margin-top: .5em;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+
+    button:nth-child(1) {
+      appearance: none;
+      border: none;
+      background: none;
+      color: #ECBA07;
+      font-size: 1em;
+      font-weight: 200;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+
+      &:hover {
+        color: darken(#ECBA07, 7%)
+      }
+    }
+
+    button:nth-child(2) {
+      padding: .5em 1em;
+      border-radius: 10px;
+      border: none;
+      background-color: #ECBA07;
+      font-weight: 500;
+      font-size: .9em;
+
+      &:hover {
+        background-color: darken(#ECBA07, 3%)
+      }
+    }
+
+  }
+
+
 }
 </style>
 

@@ -28,15 +28,17 @@ export default {
 
 <template>
   <div @click="toggle" class="mini-nav" :class="{visible : !visible}">
-    <div>
+    <div class="button">
       <slot name="button"></slot>
     </div>
-    <img src="/icons/plusOrange.svg" alt="plus icon" >
+    <img src="/icons/plusOrange.svg" alt="plus icon">
   </div>
   <section v-position="position" class="sidenav" :class="{visible: visible}">
     <div class="top">
-      <slot name="button"></slot>
-      <img src="/icons/cross.svg" alt="cross icon" @click="toggle">
+      <img src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
+      <div class="button">
+        <slot class="button" name="button"></slot>
+      </div>
     </div>
     <div class="sidenav-content">
       <slot name="content"></slot>
@@ -48,7 +50,6 @@ export default {
 
 .mini-nav {
   background-color: black;
-  color: white;
   width: fit-content;
   display: flex;
   flex-direction: row;
@@ -57,46 +58,86 @@ export default {
   gap: .5em;
   padding: .5em;
   border-radius: 5px;
+
+  img {
+    height: 1em;
+  }
 }
 
 .sidenav {
-  width: 35vw;
-  max-width: 25em;
+  width: 40vw;
+  max-width: 30em;
+  min-width: 20em;
   position: absolute;
   z-index: 1000;
   top: 0;
-  background-color: black;
+  background-color: #181818;
   height: 100%;
-  transition : all 0.5s ease;
+  transition: all 0.5s ease;
   overflow-y: scroll;
   overflow-x: hidden;
+  //padding-top: 13vh;
+
   .top {
-    position: fixed;
-    background-color: black;
+    background-color: #181818;
     z-index: 10;
-    padding: 1em;
+    width: inherit;
+    max-width: inherit;
+    min-width: inherit;
+    height: 13vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    gap: .5em;
+    border-bottom: 1px solid black;
+
+    .button {
+      width: 100%;
+      font-size: 1.5em;
+      text-transform: uppercase;
+      text-align: center;
+      padding-bottom: .5em;
+    }
+
+    img {
+      margin: 1em 1em 0;
+    }
   }
-  .sidenav-content {
-    padding-top: 5em;
-  }
+
+}
+
+.sidenav-content {
+  box-sizing: border-box;
+  padding: 1em;
+  margin-top: 14vh;
 }
 
 .sidenav.left {
   left: -40vw;
+  .top {
+    align-items: flex-end;
+  }
 }
 
 .sidenav.right {
   right: -40vw;
+  .top {
+    align-items: flex-start;
+  }
 }
 
 .sidenav.right.visible {
   right: 0;
-  transition : all 0.5s ease;
+  transition: all 0.5s ease;
+  border-left: 1px solid #D4DFD8;
 }
 
 .sidenav.left.visible {
   left: 0;
-  transition : all 0.5s ease;
+  transition: all 0.5s ease;
+  border-right: 1px solid #D4DFD8;
 }
 
 

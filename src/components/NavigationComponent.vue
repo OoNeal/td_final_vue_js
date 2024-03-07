@@ -14,13 +14,45 @@ export default {
     return {
       user: "",
       allObjectives: [],
-      objectivesDone: []
+      objectivesDone: [],
+      timeEntries: [],
+      timeWorked: 0,
     }
   },
   computed: {
     isOnActivity() {
       return this.$route.path === "/"
     },
+  },
+  methods: {
+    calcHoursWorked() {
+      const today = new Date().toISOString().slice(0, 10);
+      let totalMillisecondsWorked = 0;
+      this.timeEntries.forEach(entry => {
+        const start = new Date(entry.start);
+        const end = new Date(entry.end);
+        if (start.getDate() === end.getDate()) {
+          totalMillisecondsWorked += end.getTime() - start.getTime();
+        } else {
+          const midnightToday = new Date(today).setHours(0, 0, 0, 0);
+          totalMillisecondsWorked += end.getTime() - midnightToday;
+        }
+      })
+      const hoursWorked = Math.floor(totalMillisecondsWorked / (1000 * 60 * 60));
+      const minutesWorked = Math.floor((totalMillisecondsWorked % (1000 * 60 * 60)) / (1000 * 60));
+
+      hoursWorked ? this.timeWorked = hoursWorked + "h" + minutesWorked : this.timeWorked = minutesWorked + "min";
+    },
+    getTimeEntries() {
+      this.$api.get('time-entries').then((resp) => {
+        //je fais la même dans activity view donc à factoriser ??? mais ds le store c bad chiant
+        //il faut prendre l'activité actuelle aussi ?
+        this.timeEntries = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
+        this.calcHoursWorked()
+      }).catch((err) => {
+        console.log(err)
+      })
+    }
   },
   created() {
     if (this.connected) {
@@ -29,6 +61,7 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+
       this.$api.get('daily-objectives').then((resp) => {
         //le nombre d’objectifs atteints aujourd’hui (sur le nombre d’objectif total)
         this.allObjectives = resp.data
@@ -37,13 +70,14 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+
       this.getCurrentActivity()
+      this.getTimeEntries()
     }
   },
   watch: {
     currentTimeEntry() {
-      //this.getCurrentActivity()
-      this.currentTimeEntry ? this.startTimer() : this.timer = null
+      this.currentTimeEntry ? this.startTimer() : (this.timer = null, this.getTimeEntries())
     }
   }
 }
@@ -90,7 +124,7 @@ export default {
       <img @click="stopActivity" src="/icons/stopFull.svg" alt="stop icon">
     </div>
     <div class="hours">
-      nb heures travaillées ajrd
+      {{ timeWorked }}
     </div>
   </div>
 </template>
@@ -103,7 +137,6 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: white;
   padding: 1em;
 }
 
@@ -125,7 +158,7 @@ nav {
 }
 
 a {
-  color: white;
+  color: inherit;
   text-decoration: none;
 }
 
@@ -146,7 +179,30 @@ a {
 .router-link-active {
   color: #ECBA07;
   font-weight: 500;
+}
 
+.infos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em;
+  padding-top: .5em;
+  background-color: #1C1C1C;
+  font-size: .9em;
+  gap: 1em;
+
+}
+
+.current-activity {
+  display: flex;
+  gap: .5em;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+
+  img {
+    height: .7em;
+  }
 }
 
 </style>

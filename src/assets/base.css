@@ -7,8 +7,12 @@ body {
     font-weight: 400;
     font-size: 1rem;
     line-height: 1.5;
-    color: white;
-    background-color: #2C2C2C;
+    color: #D4DFD8;
+    background-color: #212121;
     min-height: 100vh;
     overflow-x: hidden;
+}
+
+button {
+    cursor: pointer;
 }

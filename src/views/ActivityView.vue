@@ -1,7 +1,7 @@
 <script>
 import TimeEntry from "@/components/TimeEntryComponent.vue";
 import PopUp from "@/components/PopUpComponent.vue";
-import SideBar from "@/components/SideBar.vue";
+import SideBar from "@/components/SideBarComponent.vue";
 import currentActivity from "@/mixins/currentActivity.js";
 
 export default {
@@ -103,7 +103,6 @@ export default {
     getTimeEntriesToday() {
       this.$api.get('time-entries').then((resp) => {
         this.timeEntriesToday = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
-        console.log(this.timeEntriesToday)
         this.displayTimeEntriesToday = this.timeEntriesToday
       }).catch((err) => {
         console.log(err)
@@ -242,25 +241,31 @@ export default {
       <template #button>Activités du jour</template>
       <template #content>
         <div class="activities">
-          <button @click="createTimeEntryData.creating = !createTimeEntryData.creating">Créer une entrée</button>
+          <button class="create" @click="createTimeEntryData.creating = !createTimeEntryData.creating">Créer une
+            entrée
+          </button>
+          <button v-if="filters.project_id || filters.activity_id || filters.comment" class="filter"
+                  @click="deleteFilters">Masquer les filtres
+          </button>
           <div class="filters">
-            Filtrer la liste :
-            <select v-model="filters.project_id" name="filter-project">
-              <option value="" selected disabled>Projet concerné</option>
-              <option v-for="project in allProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
-            </select>
-            <select v-model="filters.activity_id" name="filter-activity">
-              <option value="" selected disabled>Activité concernée</option>
-              <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{
-                  activity.name
-                }}
-              </option>
-            </select>
+            <div class="filters-select">
+              <select v-model="filters.project_id" name="filter-project">
+                <option value="" selected disabled>Projet concerné</option>
+                <option v-for="project in allProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
+              </select>
+              <select v-model="filters.activity_id" name="filter-activity">
+                <option value="" selected disabled>Activité concernée</option>
+                <option v-for="activity in allActivities" :key="activity.id" :value="activity.id">{{
+                    activity.name
+                  }}
+                </option>
+              </select>
+            </div>
             <input v-model="filters.comment" type="text" name="commentaire"
                    placeholder="Commentaire">
-            <button @click="deleteFilters">Supp les filtres</button>
           </div>
           <div v-if="displayTimeEntriesToday.length > 0" class="activities-list">
+            <div class="title">Liste des activités :</div>
             <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
                         :entry="entry"/>
           </div>
@@ -273,11 +278,16 @@ export default {
       <template #button>Objectifs</template>
       <template #content>
         <div class="objectives">
-          <input type="text" v-model="objectiveSearch" placeholder="Rechercher un objectif">
-          <button @click="newObjectiveData.creating = true">Créer un objectif</button>
+          <button class="create" @click="newObjectiveData.creating = true">Créer un objectif</button>
+          <button class="filter" v-if="!showObjectivesDone" @click="showAllObjectives">Voir aussi les objectifs
+            atteints
+          </button>
+          <button class="filter" v-else @click="hideObjectivesDone">Cacher les objectifs atteints</button>
+          <div class="filters">
+            <input type="text" v-model="objectiveSearch" placeholder="Rechercher un objectif">
+          </div>
           <div v-if="displayObjectives.length > 0" class="objectives-list">
-            <button v-if="!showObjectivesDone" @click="showAllObjectives">Voir aussi les objectifs atteints</button>
-            <button v-else @click="hideObjectivesDone">Cacher les objectifs atteints</button>
+            <div class="title">Liste des objectifs :</div>
             <div v-for="objective in displayObjectives" class="objective" :key="objective.id">
               {{ objective.name }}
               {{ objective.content }}
@@ -306,7 +316,8 @@ export default {
         <option value="" selected disabled>Projet concerné</option>
         <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
       </select>
-      <button v-if="!newProjectData.creating" @click="newProjectData.creating = true">Nouveau projet</button>
+      <img src="/icons/plusGrey.svg" alt="plus icon" v-if="!newProjectData.creating"
+           @click="newProjectData.creating = true">
     </div>
     <div class="select-activity">
       <select v-model="newTimeEntryData.activity_id" name="project">
@@ -314,7 +325,8 @@ export default {
         <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{ activity.name }}
         </option>
       </select>
-      <button v-if="!newActivityData.creating" @click="newActivityData.creating = true">Nouvelle activité</button>
+      <img src="/icons/plusGrey.svg" alt="plus icon" v-if="!newActivityData.creating"
+           @click="newActivityData.creating = true">
     </div>
     <div class="select-comment">
       <input v-model="newTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
@@ -371,37 +383,59 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.sidebars {
-  display: flex;
-  justify-content: space-between;
-  gap: 2em;
-  padding: 1em;
-}
 
 .current-activity, .start-activity {
   width: 50vw;
   margin: auto;
   text-align: center;
+}
 
-  .info {
-    font-size: 1.1em;
-    font-weight: 300;
+.info {
+  font-size: 1.1em;
+  font-weight: 300;
 
-    strong {
-      font-weight: 600;
-      color: #ECBA07
-    }
+  strong {
+    font-weight: 600;
+    color: #ECBA07
   }
+}
 
-  .timer {
-    font-size: 5em;
-    font-weight: 200
-  }
+.timer {
+  font-size: 5em;
+  font-weight: 200
 }
 
 h1 {
   font-size: 2.5em;
   margin-bottom: .5em;
+}
+
+.select-project, .select-activity, .select-comment {
+  display: flex;
+  justify-content: center;
+  gap: .5em;
+  align-items: center;
+  margin: .5em
+}
+
+select, input {
+  padding: .5em 1em;
+  font-size: 1em;
+  font-family: inherit;
+  border-radius: 10px;
+  border: 1px solid black;
+  color: #8c8c8c;
+  background: #1C1C1C;
+  appearance: none;
+  width: 70%;
+}
+
+select {
+  background-image: url('/icons/arrow.svg');
+  background-position: calc(100% - 0.75rem) center;
+  background-repeat: no-repeat;
+  text-overflow: ellipsis;
+  padding-right: 2.5em;
 }
 
 .startStop {
@@ -416,11 +450,99 @@ h1 {
   display: flex;
   gap: .5em;
   align-items: center;
-  margin: auto;
+  font-family: inherit;
+  margin: 2em auto auto;
 
   &:hover {
     background-color: rgba(24, 24, 24, 0.75);;
   }
+}
+
+.sidebars {
+  display: flex;
+  justify-content: space-between;
+  gap: 2em;
+  padding: 1em;
+}
+
+.activities, .objectives {
+  //Engueule moi Elian regarde comment tu vas détester comment g fait <3
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  align-items: stretch;
+  justify-content: center;
+
+  .filters {
+    width: 100%;
+  }
+
+  .filters-select {
+    display: flex;
+    gap: 1em;
+    margin-bottom: 1em;
+    flex-wrap: wrap;
+  }
+
+  select, input {
+    border-color: #636765;
+    color: #D4DFD8;
+    background-color: #323333;
+    font-size: .9em;
+    flex-basis: 13em;
+    flex-grow: 2;
+    flex-shrink: 0;
+    text-overflow: ellipsis;
+  }
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .create {
+    border: 1px solid #636765;
+    color: #D4DFD8;
+    background-color: #323333;
+    font-size: 1em;
+    font-family: inherit;
+    padding: .5em 1em;
+    border-radius: 10px;
+    margin: auto;
+
+    &:hover {
+      background-color: darken(#323333, 3%);
+    }
+  }
+
+  .filter {
+    border: none;
+    background: none;
+    appearance: none;
+    font-family: inherit;
+    color: #ECBA07;
+    font-size: 1em;
+    font-weight: 200;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-align: left;
+
+    &:hover {
+      color: darken(#ECBA07, 7%)
+    }
+  }
+
+  .title {
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-size: 1em;
+    font-weight: 200;
+    margin: .5em 0 1em;
+
+  }
+
 }
 
 </style>

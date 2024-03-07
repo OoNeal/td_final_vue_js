@@ -82,6 +82,8 @@ export default {
     background-color: #181818;
     z-index: 10;
     width: inherit;
+    max-width: inherit;
+    min-width: inherit;
     height: 13vh;
     box-sizing: border-box;
     display: flex;

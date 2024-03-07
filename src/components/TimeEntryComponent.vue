@@ -25,7 +25,6 @@ export default {
     this.$api.get(`activities/${this.entry.activity_id}`).then((resp) => {
       this.activity = resp.data.name
       this.color = resp.data.color
-      console.log(this.color)
     }).catch((err) => {
       console.log(err)
     })
@@ -122,6 +121,7 @@ export default {
   color: #D4DFD8;
   background-color: #323333;
   padding: .5em 1em;
+  margin-top:1em;
 }
 
 .top {

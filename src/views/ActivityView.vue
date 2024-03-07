@@ -1,7 +1,7 @@
 <script>
 import TimeEntry from "@/components/TimeEntryComponent.vue";
 import PopUp from "@/components/PopUpComponent.vue";
-import SideBar from "@/components/SideBar.vue";
+import SideBar from "@/components/SideBarComponent.vue";
 import currentActivity from "@/mixins/currentActivity.js";
 
 export default {

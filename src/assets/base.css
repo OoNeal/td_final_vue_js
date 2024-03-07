@@ -15,8 +15,10 @@ body {
 
 button {
     cursor: pointer;
+    font-family: inherit;
 }
 
 input:focus {
     outline:none;
 }
+

@@ -296,7 +296,8 @@ export default {
           </div>
           <div v-if="displayObjectives.length > 0" class="objectives-list">
             <div class="title">Liste des objectifs :</div>
-            <objective @update-objectives="getObjectives" :objective="objective" v-for="objective in displayObjectives" class="objective" :key="objective.id"/>
+            <objective @update-objectives="getObjectives" :objective="objective" v-for="objective in displayObjectives"
+                       class="objective" :key="objective.id"/>
           </div>
           <div v-else>
             <p v-if="allObjectives">Tous les objectifs d'aujourd'hui ont été atteints !</p>
@@ -343,44 +344,66 @@ export default {
   <pop-up @close="newActivityData.creating = false" id="popupNewActivity" v-if="newActivityData.creating">
     <template #title>Nouvelle activité :</template>
     <template #content>
-      <input type="text" v-model="newActivityData.name" placeholder="Nom de l'activité">
-      <input type="color" v-model="newActivityData.color">
+      <div class="new-activity">
+        <div class="label">
+          <label for="name">Nom de l'activité :</label>
+          <input name="name" type="text" v-model="newActivityData.name" placeholder="Nom de l'activité">
+        </div>
+        <div class="label color">
+          <label for="color">Couleur associée :</label>
+          <input name="color" type="color" v-model="newActivityData.color">
+        </div>
+      </div>
     </template>
     <template #button><span @click="createActivity">Créer l'activité</span></template>
-
   </pop-up>
   <pop-up @close="newProjectData.creating = false" id="popupNewProject" v-if="newProjectData.creating">
     <template #title>Nouveau projet :</template>
     <template #content>
-      <input type="text" v-model="newProjectData.name" placeholder="Nom de du projet">
-      <input type="text" v-model="newProjectData.description" placeholder="Description du projet">
+      <div class="new-project">
+        <div class="label">
+          <label for="name">Nom du projet :</label>
+          <input name="name" type="text" v-model="newProjectData.name" placeholder="Nom du projet">
+        </div>
+        <div class="label">
+          <label for="desc">Description du projet :</label>
+          <input name="desc" type="text" v-model="newProjectData.description" placeholder="Description du projet">
+        </div>
+      </div>
     </template>
     <template #button><span @click="createProject">Créer le projet</span></template>
   </pop-up>
   <pop-up @close="createTimeEntryData.creating = false" id="popupNewEntry" v-if="createTimeEntryData.creating">
     <template #title>Nouvelle entrée :</template>
     <template #content>
-      <div class="select-project">
-        <select v-model="createTimeEntryData.project_id" name="activity">
-          <option value="" selected disabled>Projet concerné</option>
-          <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
-        </select>
-      </div>
-      <div class="select-activity">
-        <select v-model="createTimeEntryData.activity_id" name="project">
-          <option value="" selected disabled>Type d'activité</option>
-          <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{
-              activity.name
-            }}
-          </option>
-        </select>
-      </div>
-      <div class="select-comment">
-        <input v-model="createTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
-      </div>
-      <div class="select-times">
-        <input v-model="createTimeEntryData.start" type="datetime-local" name="start">
-        <input v-model="createTimeEntryData.end" type="datetime-local" name="end">
+      <div class="new-time-entry">
+        <div class="selects">
+          <select v-model="createTimeEntryData.project_id" name="activity">
+            <option value="" selected disabled>Projet concerné</option>
+            <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
+          </select>
+          <select v-model="createTimeEntryData.activity_id" name="project">
+            <option value="" selected disabled>Type d'activité</option>
+            <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{
+                activity.name
+              }}
+            </option>
+          </select>
+        </div>
+        <div class="label">
+          <label for="comment">Commentaire :</label>
+          <input name="comment" v-model="createTimeEntryData.comment" type="text" placeholder="Commentaire">
+        </div>
+        <div class="times">
+          <div class="label">
+            <label for="start">Début :</label>
+            <input name="start" v-model="createTimeEntryData.start" type="datetime-local">
+          </div>
+          <div class="label">
+            <label for="end">Fin :</label>
+            <input v-model="createTimeEntryData.end" type="datetime-local" name="end">
+          </div>
+        </div>
       </div>
     </template>
     <template #button><span @click="createTimeEntry">Créer l'entrée</span></template>
@@ -388,11 +411,18 @@ export default {
   <pop-up @close="newObjectiveData.creating = false" id="popupNewObjective" v-if="newObjectiveData.creating">
     <template #title>Nouvel objectif :</template>
     <template #content>
-      <input type="text" v-model="newObjectiveData.name" placeholder="Intitulé de l'objectif">
-      <input type="text" v-model="newObjectiveData.content" placeholder="Description de l'objectif">
+      <div class="new-objective">
+        <div class="label">
+          <label for="name">Intitulé de l'objectif :</label>
+          <input name="name" type="text" v-model="newObjectiveData.name" placeholder="Intitulé de l'objectif">
+        </div>
+        <div class="label">
+          <label for="content">Description :</label>
+          <input name="content" type="text" v-model="newObjectiveData.content" placeholder="Description de l'objectif">
+        </div>
+      </div>
     </template>
     <template #button><span @click="createObjective">Créer l'objectif</span></template>
-
   </pop-up>
 </template>
 
@@ -554,9 +584,70 @@ select {
     font-size: 1em;
     font-weight: 200;
     margin: .5em 0 1em;
+  }
+}
 
+.new-activity, .new-objective, .new-project, .new-time-entry {
+  display: flex;
+  flex-direction: column;
+  gap: .7em;
+
+  .label {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
   }
 
+  input[type="text"] {
+    width: inherit;
+    font-size: .9em;
+  }
+
+  .color {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  input[type="color"] {
+    appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    height: 1.4em;
+    width: 1.4em;
+    padding: 0;
+    border-radius: 20%
+  }
+
+  ::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  ::-webkit-color-swatch{
+    border: 0;
+    border-radius: 0;
+  }
+  ::-moz-color-swatch,
+  ::-moz-focus-inner{
+    border: 0;
+  }
+  ::-moz-focus-inner{
+    padding: 0;
+  }
+
+  label {
+    font-weight: 400;
+  }
+
+  .selects {
+    display: flex;
+    gap: .5em;
+  }
+
+  input[type="datetime-local"] {
+    width: inherit;
+  }
 }
+
 
 </style>

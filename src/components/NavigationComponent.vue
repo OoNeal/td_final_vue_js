@@ -118,8 +118,8 @@ export default {
   </header>
 
   <div class="infos" v-if="connected">
-    <div v-if="allObjectives" class="objectives">
-      {{ objectivesDone.length }} / {{ allObjectives.length }}
+    <div class="objectives">
+      <span v-if="allObjectives">{{ objectivesDone.length }} / {{ allObjectives.length }}</span>
     </div>
     <div v-if="!isOnActivity && timer" class="current-activity">
       <div>{{ timer }}</div>

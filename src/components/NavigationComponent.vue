@@ -62,11 +62,13 @@ export default {
         console.log(err)
       })
 
-      this.$api.get('daily-objectives').then((resp) => {
+      this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
         //le nombre d’objectifs atteints aujourd’hui (sur le nombre d’objectif total)
-        this.allObjectives = resp.data
-        this.allObjectives.sort((a, b) => new Date(b.date) - new Date(a.date))
-        this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
+        if (resp.data.length > 0) {
+          this.allObjectives = resp.data
+          this.allObjectives.sort((a, b) => new Date(b.date) - new Date(a.date))
+          this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
+        }
       }).catch((err) => {
         console.log(err)
       })
@@ -116,7 +118,7 @@ export default {
   </header>
 
   <div class="infos" v-if="connected">
-    <div class="objectives">
+    <div v-if="allObjectives" class="objectives">
       {{ objectivesDone.length }} / {{ allObjectives.length }}
     </div>
     <div v-if="!isOnActivity && timer" class="current-activity">

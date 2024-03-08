@@ -106,8 +106,10 @@ export default {
       })
     },
     getObjectives() {
-      this.$api.get('daily-objectives').then((resp) => {
-        this.allObjectives = resp.data.sort((a, b) => new Date(b.date) - new Date(a.date));        this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+      this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
+        //est-ce que les objectifs seraient pas seulement ceux de ajrd ??? c'est le concept de daily objectives
+        this.allObjectives = resp.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
         //peut mieux faire mais flemme
         this.hideObjectivesDone()
       }).catch((err) => {
@@ -297,7 +299,8 @@ export default {
             <objective @update-objectives="getObjectives" :objective="objective" v-for="objective in displayObjectives" class="objective" :key="objective.id"/>
           </div>
           <div v-else>
-            <p>Vous n'avez aucun objectif.</p>
+            <p v-if="allObjectives">Tous les objectifs d'aujourd'hui ont été atteints !</p>
+            <p v-else>Aucun objectif défini pour aujourd'hui... </p>
           </div>
         </div>
       </template>

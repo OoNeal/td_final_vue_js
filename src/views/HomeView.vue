@@ -5,7 +5,9 @@ import PopUp from "@/components/PopUpComponent.vue";
 import SideBar from "@/components/SideBarComponent.vue";
 import currentActivity from "@/mixins/currentActivity.js";
 import {toast} from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
+import ToastOptions from "../../toasts/toastOptions.js";
+import {mapActions, mapState} from 'pinia'
+import {useAllObjectivesStore} from "@/stores/allObjectives.js";
 
 export default {
   components: {
@@ -28,8 +30,8 @@ export default {
       enabledActivities: [],
       enabledProjects: [],
 
-      //que les objectifs qu'on affiche (on filtre allObjectives pour déterminer displayObjectives)
-      allObjectives: [],
+      //que les objectifs qu'on affiche (on filtre objectives pour déterminer displayObjectives)
+      objectives: [],
       displayObjectives: [],
       showObjectivesDone: false,
       objectiveSearch: "",
@@ -94,11 +96,13 @@ export default {
     }).catch((err) => {
       console.log(err)
     })
-    this.getObjectives()
+    this.objectives = this.allObjectives
+    this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
     this.getTimeEntriesToday()
     this.startTimer()
   },
   methods: {
+    ...mapActions(useAllObjectivesStore, ['setObjectives', 'addObjective']),
     getTimeEntriesToday() {
       this.$api.get('time-entries').then((resp) => {
         this.timeEntriesToday = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
@@ -109,8 +113,8 @@ export default {
     },
     getObjectives() {
       this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
-        this.allObjectives = resp.data
-        this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+        this.setObjectives(resp.data)
+        this.displayObjectives = resp.data.filter(objective => objective.done === 0);
         this.hideObjectivesDone()
       }).catch((err) => {
         console.log(err)
@@ -129,19 +133,9 @@ export default {
           color: ""
         }
         this.newTimeEntryData.activity_id = resp.data.id
-        toast("Activité créée !", {
-          "theme": "dark",
-          "type": "success",
-          "position": "bottom-right",
-          "transition": "flip"
-        })
+        toast.success(`Activité créée !`, ToastOptions);
       }).catch((err) => {
-        toast(`${err.response.data.errors} !`, {
-          "theme": "dark",
-          "type": "error",
-          "position": "bottom-right",
-          "transition": "flip"
-        })
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
         this.errors.push(err)
       })
     },
@@ -157,19 +151,9 @@ export default {
           name: "",
           description: ""
         }
-        toast("Projet créé !", {
-          "theme": "dark",
-          "type": "success",
-          "position": "bottom-right",
-          "transition": "flip"
-        })
+        toast.success(`Projet créé !`, ToastOptions);
       }).catch((err) => {
-        toast(`${err.response.data.errors} !`, {
-          "theme": "dark",
-          "type": "error",
-          "position": "bottom-right",
-          "transition": "flip"
-        })
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     createObjective() {
@@ -182,32 +166,22 @@ export default {
           name: "",
           content: ""
         }
-        this.allObjectives.unshift(resp.data)
+        this.objectives.unshift(resp.data)
         this.displayObjectives.unshift(resp.data)
-        toast("Objectif créé !", {
-          "theme": "dark",
-          "type": "success",
-          "position": "bottom-right",
-          "transition": "flip"
-        })
+        toast.success(`Objectif créé !`, ToastOptions);
       }).catch((err) => {
-        toast(`${err.response.data.errors} !`, {
-          "theme": "dark",
-          "type": "error",
-          "position": "bottom-right",
-          "transition": "flip"
-        })
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     showAllObjectives() {
       this.objectiveSearch = ""
       this.showObjectivesDone = true
-      this.displayObjectives = this.allObjectives
+      this.displayObjectives = this.objectives
     },
     hideObjectivesDone() {
       this.objectiveSearch = ""
       this.showObjectivesDone = false
-      this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+      this.displayObjectives = this.objectives.filter(objective => objective.done === 0);
     },
     createTimeEntry() {
       if (this.createTimeEntryData.activity_id !== "" && this.createTimeEntryData.project_id !== "" && this.createTimeEntryData.end !== "" && this.createTimeEntryData.start !== "") {
@@ -230,27 +204,12 @@ export default {
             end: ""
           }
           this.getTimeEntriesToday()
-          toast("Entrée ajoutée !", {
-            "theme": "dark",
-            "type": "success",
-            "position": "bottom-right",
-            "transition": "flip"
-          })
+          toast.success(`Entrée ajoutée !`, ToastOptions);
         }).catch((err) => {
-          toast(`${err.response.data.errors} !`, {
-            "theme": "dark",
-            "type": "error",
-            "position": "bottom-right",
-            "transition": "flip"
-          })
+          toast.error(`${err.response.data.errors} !`, ToastOptions);
         })
       } else {
-        toast(`Définir un début et une fin !`, {
-          "theme": "dark",
-          "type": "error",
-          "position": "bottom-right",
-          "transition": "flip"
-        })
+        toast.error(`Définit un début et une fin !`, ToastOptions);
       }
     },
     startActivity() {
@@ -265,20 +224,9 @@ export default {
           this.newTimeEntryData.activity_id = ""
           this.newTimeEntryData.project_id = ""
           this.newTimeEntryData.comment = ""
-          toast("Activité lancée !", {
-            "theme": "dark",
-            "type": "success",
-            "position": "bottom-right",
-            "transition": "flip"
-          })
+          toast.success(`Activité lancée !`, ToastOptions);
         }).catch((err) => {
-          toast(`${err.response.data.errors[0]} !</br>${err.response.data.errors[1]} !`, {
-            "theme": "dark",
-            "type": "error",
-            "position": "bottom-right",
-            "transition": "flip",
-            "dangerouslyHTMLString": true
-          })
+          toast.error(`${err.response.data.errors[0]} !</br>${err.response.data.errors[1]} !`, ToastOptions);
         })
       }
     },
@@ -289,6 +237,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(useAllObjectivesStore, ['allObjectives']),
     currentActivityProject() {
       let project = this.allProjects.find(project => project.id === this.currentTimeEntry.project_id)
       return project ? project.name : ""
@@ -301,8 +250,8 @@ export default {
   watch: {
     objectiveSearch() {
       this.showObjectivesDone ?
-          this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch))
-          : this.displayObjectives = this.allObjectives.filter(objective => objective.name.includes(this.objectiveSearch) && objective.done === 0)
+          this.displayObjectives = this.objectives.filter(objective => objective.name.includes(this.objectiveSearch))
+          : this.displayObjectives = this.objectives.filter(objective => objective.name.includes(this.objectiveSearch) && objective.done === 0)
     },
     filters: {
       handler() {
@@ -317,6 +266,10 @@ export default {
     currentTimeEntry() {
       //quand acti arrêtée (cf méthode ds le mixin), on refresh les timeEntries
       !this.currentTimeEntry ? this.getTimeEntriesToday() : null
+    },
+    allObjectives() {
+      this.objectives = this.allObjectives
+      this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
     }
   },
 }
@@ -380,7 +333,7 @@ export default {
                        class="objective" :key="objective.id"/>
           </div>
           <div v-else>
-            <p v-if="allObjectives">Tous les objectifs d'aujourd'hui ont été atteints !</p>
+            <p v-if="objectives">Tous les objectifs d'aujourd'hui ont été atteints !</p>
             <p v-else>Aucun objectif défini pour aujourd'hui... </p>
           </div>
         </div>

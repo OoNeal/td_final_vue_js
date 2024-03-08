@@ -1,5 +1,7 @@
 <script>
 import currentActivity from "@/mixins/currentActivity.js";
+import {mapActions, mapState} from 'pinia'
+import {useAllObjectivesStore} from "@/stores/allObjectives.js";
 
 export default {
   mixins: [currentActivity],
@@ -13,7 +15,7 @@ export default {
   data() {
     return {
       user: "",
-      allObjectives: [],
+      objectives: [],
       objectivesDone: [],
       timeEntries: [],
       timeWorked: 0,
@@ -23,8 +25,10 @@ export default {
     isOnActivity() {
       return this.$route.path === "/"
     },
+    ...mapState(useAllObjectivesStore, ['allObjectives']),
   },
   methods: {
+    ...mapActions(useAllObjectivesStore, ['setObjectives']),
     calcHoursWorked() {
       const today = new Date().toISOString().slice(0, 10);
       let totalMillisecondsWorked = 0;
@@ -63,10 +67,8 @@ export default {
       })
 
       this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
-        //le nombre d’objectifs atteints aujourd’hui (sur le nombre d’objectif total)
         if (resp.data.length > 0) {
-          this.allObjectives = resp.data
-          this.allObjectives.sort((a, b) => new Date(b.date) - new Date(a.date))
+          this.setObjectives(resp.data)
           this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
         }
       }).catch((err) => {
@@ -80,6 +82,10 @@ export default {
   watch: {
     currentTimeEntry() {
       this.currentTimeEntry ? this.startTimer() : (this.timer = null, this.getTimeEntries())
+    },
+    allObjectives() {
+      this.objectives = this.allObjectives
+      this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
     }
   }
 }
@@ -119,7 +125,7 @@ export default {
 
   <div class="infos" v-if="connected">
     <div class="objectives">
-      <span v-if="allObjectives">{{ objectivesDone.length }} / {{ allObjectives.length }}</span>
+      <span v-if="objectives">{{ objectivesDone.length }} / {{ objectives.length }}</span>
     </div>
     <div v-if="!isOnActivity && timer" class="current-activity">
       <div>{{ timer }}</div>

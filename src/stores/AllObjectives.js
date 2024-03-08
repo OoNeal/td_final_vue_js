@@ -11,14 +11,13 @@ export const useAllObjectivesStore = defineStore('allObjectives', {
         strategies:
             [
                 {
-                    storage: localStorage, paths: ['objectives']
+                    storage: localStorage, paths: ['allObjectives']
                 }
             ]
     },
     actions: {
         setObjectives(objectives) {
             this.allObjectives = objectives
-            this.allObjectives.sort((a, b) => new Date(b.date) - new Date(a.date))
         },
         addObjective(objective) {
             this.allObjectives.unshift(objective)

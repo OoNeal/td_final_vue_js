@@ -1,40 +1,50 @@
 <script>
 
-import SidebarComponent from '@/components/Sidebar/SidebarComponent.vue'
-import ItemComponent from '@/components/Sidebar/ItemComponent.vue'
+import SideBarComponent from '@/components/SideBarComponent.vue'
+import SideBarItemComponent from '@/components/SideBarItemComponent.vue'
 
 export default {
-  components: { SidebarComponent, ItemComponent }
+  components: { SideBarComponent, SideBarItemComponent },
 }
 </script>
 
 <template>
   <main>
-    <SidebarComponent direction="right">
-      <ItemComponent to="/settings/profile">Profile</ItemComponent>
-      <hr />
-      <ItemComponent to="/settings/account">Account</ItemComponent>
-      <hr />
-      <ItemComponent to="/settings/notifications">Notifications</ItemComponent>
-    </SidebarComponent>
-  <RouterView />
+    <div class="settings_sidebar">
+      <SideBarComponent position="left">
+        <template #button>Paramètres</template>
+        <template #content>
+          <SideBarItemComponent to="/settings/profile">Mon Profil</SideBarItemComponent>
+          <SideBarItemComponent to="/settings/activity">Activités</SideBarItemComponent>
+          <SideBarItemComponent to="/settings/project">Projets</SideBarItemComponent>
+          <SideBarItemComponent is-logout to="/auth/login">Déconnexion</SideBarItemComponent>
+        </template>
+      </SideBarComponent>
+    </div>
+    <RouterView />
   </main>
 </template>
 
 <style scoped>
+body {
+  overflow: hidden;
+}
+
+.settings_sidebar {
+  box-sizing: border-box;
+  padding: 1em;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
 main {
   width: 100vw;
-  height: 90vh;
+  height: 100%;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  background-color: #212121;
+}
 
-  background-color: #333333;
-}
-hr {
-  width: 80%;
-  margin: 0;
-  border: 1px solid #808080;
-}
+
 </style>

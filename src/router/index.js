@@ -56,6 +56,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
+  if (to.path === '/settings') return '/settings/profile';
   const publicPages = ['/auth', '/auth/', '/auth/login', '/auth/register'];
   const authRequired = !publicPages.includes(to.path);
   const store = useAuthStore();

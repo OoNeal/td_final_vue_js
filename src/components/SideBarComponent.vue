@@ -77,7 +77,8 @@ export default {
   position: absolute;
   z-index: 1000;
   top: 0;
-  background-color: #181818;
+  background-color: rgba(24,24,24,0.7);
+  backdrop-filter: blur(15px);
   height: 100%;
   transition: all 0.5s ease;
   overflow-y: scroll;

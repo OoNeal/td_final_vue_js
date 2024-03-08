@@ -24,7 +24,7 @@ export default {
         name: `${this.firstname} ${this.name}`,
         email: this.email,
       }).then((resp) => {
-        this.setApiKey(`key=${resp.data.key}`);
+        this.setApiKey(resp.data.key);
         this.$router.push(this.returnUrl || "/");
       }).catch((err) => {
         this.errors.push(err.response.data.errors[0]);

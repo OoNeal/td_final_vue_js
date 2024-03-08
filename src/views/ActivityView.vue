@@ -123,7 +123,11 @@ export default {
       }).then((resp) => {
         this.enabledActivities.push(resp.data)
         this.allActivities.push(resp.data)
-        this.newActivityData.creating = false
+        this.newActivityData = {
+          creating: false,
+          name: "",
+          color: ""
+        }
         this.newTimeEntryData.activity_id = resp.data.id
       }).catch((err) => {
         console.log(err.response.data.errors)
@@ -137,7 +141,11 @@ export default {
       }).then((resp) => {
         this.enabledProjects.push(resp.data)
         this.allProjects.push(resp.data)
-        this.newProjectData.creating = false
+        this.newProjectData = {
+          creating: false,
+          name: "",
+          description: ""
+        }
       }).catch((err) => {
         console.log(err.response.data.errors)
       })
@@ -147,7 +155,11 @@ export default {
         name: this.newObjectiveData.name,
         content: this.newObjectiveData.content
       }).then((resp) => {
-        this.newObjectiveData.creating = false
+        this.newObjectiveData = {
+          creating: false,
+          name: "",
+          content: ""
+        }
         this.allObjectives.unshift(resp.data)
         this.displayObjectives.unshift(resp.data)
       }).catch((err) => {
@@ -174,11 +186,14 @@ export default {
           end: this.createTimeEntryData.end.replace("T", " ")
         }).then((resp) => {
           // TODO : push dans activitiesToday si la date de début et de fin c ajrd
-          this.createTimeEntryData.activity_id = ""
-          this.createTimeEntryData.project_id = ""
-          this.createTimeEntryData.comment = ""
-          this.createTimeEntryData.start = ""
-          this.createTimeEntryData.end = ""
+          this.createTimeEntryData = {
+            creating: false,
+            activity_id: "",
+            project_id: "",
+            comment: "",
+            start: "",
+            end: ""
+          }
           this.getTimeEntriesToday()
         }).catch((err) => {
           console.log(err)
@@ -283,7 +298,7 @@ export default {
     </side-bar>
 
     <side-bar position="right">
-      <template #button>Objectifs</template>
+      <template #button>Objectifs du jour</template>
       <template #content>
         <div class="objectives">
           <button class="create" @click="newObjectiveData.creating = true">Créer un objectif</button>
@@ -623,15 +638,18 @@ select {
   ::-webkit-color-swatch-wrapper {
     padding: 0;
   }
-  ::-webkit-color-swatch{
+
+  ::-webkit-color-swatch {
     border: 0;
     border-radius: 0;
   }
+
   ::-moz-color-swatch,
-  ::-moz-focus-inner{
+  ::-moz-focus-inner {
     border: 0;
   }
-  ::-moz-focus-inner{
+
+  ::-moz-focus-inner {
     padding: 0;
   }
 

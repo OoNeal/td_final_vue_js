@@ -1,9 +1,8 @@
 <script>
-import ReportingHeader from '@/components/ReportingHeaderComponent.vue'
 import DatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import { DoughnutChart } from 'vue-chart-3'
-import { Chart, registerables } from 'chart.js'
+import {DoughnutChart} from 'vue-chart-3'
+import {Chart, registerables} from 'chart.js'
 import TimeEntry from '@/components/TimeEntryComponent.vue'
 
 Chart.register(...registerables)
@@ -11,8 +10,7 @@ export default {
   components: {
     TimeEntry,
     DatePicker,
-    DoughnutChart,
-    ReportingHeader
+    DoughnutChart
   },
   watch: {
     startDate() {
@@ -23,6 +21,7 @@ export default {
     },
     projectId() {
       this.updateView()
+      this.display = 1;
     }
   },
   created() {
@@ -38,6 +37,8 @@ export default {
       workingHours: 0,
       projectId: '',
       projects: [],
+
+      display: 1,
 
       projectData: {
         labels: [],
@@ -70,7 +71,7 @@ export default {
         this.projects = resp.data
       })
     },
-    getProjectById: function(id) {
+    getProjectById: function (id) {
       return this.$api.get('projects/' + id).then((resp) => {
         return {
           id: resp.data.id,
@@ -90,7 +91,7 @@ export default {
         }
       })
     },
-    getData: function() {
+    getData: function () {
       let workingHours = 0
       let projectHours = {}
       let activityHours = {}
@@ -228,56 +229,75 @@ export default {
 
 <template>
   <main class="main">
-    <h1>Statistiques</h1>
-    <ReportingHeader>
-      <template #startDate>
+    <div class="top">
+      <h1>
+        Statistiques du
         <DatePicker class="datepicker-size" v-model="startDate" :enable-time-picker="false"
                     :highlight="intervalDates()" :max-date="new Date()" prevent-min-max-navigation auto-apply>
           <template #trigger>
             <span class="clickable-text">{{ checkDates(startDate) }}</span>
           </template>
         </DatePicker>
-      </template>
-      <template #endDate>
+        au
         <DatePicker class="datepicker-size" v-model="endDate" :enable-time-picker="false"
                     :highlight="intervalDates()" :max-date="new Date()" prevent-min-max-navigation auto-apply>
           <template #trigger>
             <span class="clickable-text">{{ checkDates(endDate) }}</span>
           </template>
         </DatePicker>
-      </template>
-    </ReportingHeader>
-    <select v-model="projectId">
-      <option v-for="project in projects" :key="project.id" :value="project.id">
-        {{ project.name }}
-      </option>
-    </select>
-    <button @click="projectId = ''">Clear</button>
-
-
-    <h3>Sur cette période vous avez travaillé pendant</h3>
-    <h2>{{ this.workingHours }}</h2>
-
-    <h3>Heures de travail / projet</h3>
-    <h3>Heures de travail / activité</h3>
-    <div id="chart">
-      <DoughnutChart class="chart-size" :chart-data="this.projectData" />
-      <DoughnutChart class="chart-size" :chart-data="this.activityData" />
+      </h1>
+      <div class="filter">
+        <div>Filtrer :</div>
+        <select v-model="projectId">
+          <option value="" selected disabled>Projet concerné</option>
+          <option v-for="project in projects" :key="project.id" :value="project.id">
+            {{ project.name }}
+          </option>
+        </select>
+        <button v-if="projectId !== ''" @click="projectId = ''">Effacer</button>
+      </div>
     </div>
-    <div>
-      <h2>Times Entries</h2>
-      {{ this.displayedTimeEntries.length }} entries
-      <TimeEntry :entry="timeEntry" v-for="timeEntry in sortTimesEntries()" :key="timeEntry.id" />
 
+    <h2>Sur cette période vous avez travaillé pendant <span class="time">{{ this.workingHours }}</span></h2>
+
+    <div v-if="this.displayedTimeEntries.length > 0" class="data">
+      <div class="infos charts">
+        <div class="top" v-if="display === 1">
+          <h3>Heures de travail / <strong>activité</strong></h3>
+          <button v-if="projectId === ''" @click="display = 2" >Afficher par projet</button>
+        </div>
+        <div class="top" v-else-if="display === 2">
+          <h3>Heures de travail / <strong>projet</strong></h3>
+          <button @click="display = 1">Afficher par activité</button>
+        </div>
+        <div v-if="display === 1" class="chart">
+          <DoughnutChart class="chart-size" :chart-data="this.activityData"/>
+        </div>
+        <div v-if="display === 2" class="chart">
+          <DoughnutChart class="chart-size" :chart-data="this.projectData"/>
+        </div>
+      </div>
+
+      <div class="infos time-entries">
+        <div class="title">Liste des {{ this.displayedTimeEntries.length }} entrées : </div>
+        <div class="entries">
+          <TimeEntry :entry="timeEntry" v-for="timeEntry in sortTimesEntries()" :key="timeEntry.id"/>
+        </div>
+      </div>
     </div>
+    <div v-else-if="projectId === ''">
+      Aucune entrée ne correspond à la période et au projet choisi...
+    </div>
+    <div v-else>Aucune entrée n'a été enregistrée sur cette période...</div>
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+
 .clickable-text {
   width: fit-content;
   cursor: pointer;
-  color: blue;
+  color: #7471F2;
 }
 
 .datepicker-size {
@@ -290,7 +310,114 @@ export default {
   gap: 20px;
 }
 
-.chart-size {
-  width: 50%;
+main {
+  overflow: hidden;
+  padding: 2em 2em 1em;
 }
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .datepicker-size {
+    font-family: inherit;
+  }
+}
+
+h1 {
+  margin: 0;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 1.5em;
+  display: flex;
+  gap: .5em;
+}
+
+.filter {
+  display: flex;
+  gap: .25em;
+  align-items: center;
+  div {
+    text-transform: uppercase;
+    color: #ECBA07;
+    font-weight: 200;
+    font-size: 1.2em;
+    padding-right: .5em;
+  }
+
+}
+
+button {
+  background-color: unset;
+  color: #ECBA07;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-weight: 100;
+}
+
+select {
+  font-family: inherit;
+  font-size: .9em;
+  border-radius: 10px;
+  border: 1px solid #636765;
+  color: rgba(255, 255, 255, 0.57);
+  background-color: #1C1C1C;
+  appearance: none;
+  background-image: url('/icons/arrow.svg');
+  background-position: calc(100% - 0.75rem) center;
+  background-repeat: no-repeat;
+  text-overflow: ellipsis;
+  padding: .5em 2.5em .5em 1em;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-weight: 250;
+  margin: 1em 0;
+  text-align: center;
+  .time {
+    font-weight: 500;
+  }
+}
+
+.data {
+  display: flex;
+  flex-direction: row;
+}
+
+.infos {
+  flex-basis : 50vw;
+}
+
+.charts {
+  padding-right: 1em;
+  border-right: 2px solid #D4DFD8;
+
+  h3 {
+    font-weight: 400;
+  }
+
+  button {
+    font-size: 1em;
+  }
+}
+.time-entries {
+  padding-left: 1em;
+  .title {
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-size: 1em;
+    font-weight: 200;
+    margin-bottom: 1em;
+  }
+  .entries {
+    overflow-y: scroll;
+    height: 57vh;
+  }
+}
+
+
 </style>

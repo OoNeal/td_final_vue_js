@@ -258,7 +258,7 @@ export default {
       </div>
     </div>
 
-    <h2>Sur cette période vous avez travaillé pendant <span class="time">{{ this.workingHours }}</span></h2>
+    <h2>Sur cette période, vous avez travaillé pendant <span class="time">{{ this.workingHours }}</span></h2>
 
     <div v-if="this.displayedTimeEntries.length > 0" class="data">
       <div class="infos charts">

@@ -107,10 +107,8 @@ export default {
     },
     getObjectives() {
       this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
-        //est-ce que les objectifs seraient pas seulement ceux de ajrd ??? c'est le concept de daily objectives
-        this.allObjectives = resp.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        this.allObjectives = resp.data
         this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
-        //peut mieux faire mais flemme
         this.hideObjectivesDone()
       }).catch((err) => {
         console.log(err)

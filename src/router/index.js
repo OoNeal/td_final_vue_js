@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/Auth.js'
-import Activity from "@/views/ActivityView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path:'/',
-      component: Activity
+      component: () => import('@/views/HomeView.vue'),
     },
     {
       path: '/auth',

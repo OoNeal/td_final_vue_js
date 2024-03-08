@@ -11,7 +11,7 @@ export const useCurrentActivityStore = defineStore('currentActivity', {
         strategies:
             [
                 {
-                    storage: localStorage, paths: ['activity']
+                    storage: localStorage, paths: ['currentTimeEntry']
                 }
             ]
     },

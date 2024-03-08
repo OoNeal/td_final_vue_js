@@ -1,5 +1,8 @@
 <script>
 
+import {toast} from "vue3-toastify";
+import ToastOptions from "../../toasts/toastOptions.js";
+
 export default {
   emits: ['update-entries'],
   props: {
@@ -31,7 +34,6 @@ export default {
   },
   computed: {
     calcHoursBetween() {
-      //ressemble à calcHoursWorked dans NavigationComponent.vue
       let totalMillisecondsWorked = 0;
       const start = new Date(this.entry.start);
       const end = new Date(this.entry.end);
@@ -51,8 +53,9 @@ export default {
     deleteEntry() {
       this.$api.delete('time-entries/' + this.entry.id).then(() => {
         this.$emit('update-entries')
+        toast.success(`Entrée supprimée !`, ToastOptions);
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     changeEntry() {
@@ -69,8 +72,9 @@ export default {
       }).then(() => {
         this.newEntry = null
         this.$emit('update-entries')
+        toast.success(`Entrée modifiée !`, ToastOptions);
       }).catch((err) => {
-        console.log(err.response.data.errors)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     }
   },

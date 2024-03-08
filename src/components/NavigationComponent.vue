@@ -2,6 +2,8 @@
 import currentActivity from "@/mixins/currentActivity.js";
 import {mapActions, mapState} from 'pinia'
 import {useAllObjectivesStore} from "@/stores/allObjectives.js";
+import {toast} from "vue3-toastify";
+import ToastOptions from "../../toasts/toastOptions.js";
 
 export default {
   mixins: [currentActivity],

@@ -1,6 +1,11 @@
 <script>
 export default {
   props: {
+    canClose: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
     position: {
       type: String,
       required: true,
@@ -27,7 +32,7 @@ export default {
 </script>
 
 <template>
-  <div @click="toggle" class="mini-nav" :class="{visible : !visible}">
+  <div v-if="canClose" @click="toggle" class="mini-nav" :class="{visible : !visible}">
     <div class="button">
       <slot name="button"></slot>
     </div>
@@ -35,7 +40,7 @@ export default {
   </div>
   <section v-position="position" class="sidenav" :class="{visible: visible}">
     <div class="top">
-      <img src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
+      <img v-if="canClose" src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
       <div class="button">
         <slot class="button" name="button"></slot>
       </div>
@@ -58,6 +63,7 @@ export default {
   gap: .5em;
   padding: .5em;
   border-radius: 5px;
+  cursor: pointer;
 
   img {
     height: 1em;
@@ -103,6 +109,7 @@ export default {
 
     img {
       margin: 1em 1em 0;
+      cursor: pointer;
     }
   }
 

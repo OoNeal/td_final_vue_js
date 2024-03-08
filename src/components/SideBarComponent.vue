@@ -63,6 +63,7 @@ export default {
   gap: .5em;
   padding: .5em;
   border-radius: 5px;
+  cursor: pointer;
 
   img {
     height: 1em;
@@ -108,6 +109,7 @@ export default {
 
     img {
       margin: 1em 1em 0;
+      cursor: pointer;
     }
   }
 

@@ -4,6 +4,8 @@ import Objective from "@/components/ObjectiveComponent.vue";
 import PopUp from "@/components/PopUpComponent.vue";
 import SideBar from "@/components/SideBarComponent.vue";
 import currentActivity from "@/mixins/currentActivity.js";
+import {toast} from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export default {
   components: {
@@ -127,8 +129,19 @@ export default {
           color: ""
         }
         this.newTimeEntryData.activity_id = resp.data.id
+        toast("Activité créée !", {
+          "theme": "dark",
+          "type": "success",
+          "position": "bottom-right",
+          "transition": "flip"
+        })
       }).catch((err) => {
-        console.log(err.response.data.errors)
+        toast(`${err.response.data.errors} !`, {
+          "theme": "dark",
+          "type": "error",
+          "position": "bottom-right",
+          "transition": "flip"
+        })
         this.errors.push(err)
       })
     },
@@ -144,8 +157,19 @@ export default {
           name: "",
           description: ""
         }
+        toast("Projet créé !", {
+          "theme": "dark",
+          "type": "success",
+          "position": "bottom-right",
+          "transition": "flip"
+        })
       }).catch((err) => {
-        console.log(err.response.data.errors)
+        toast(`${err.response.data.errors} !`, {
+          "theme": "dark",
+          "type": "error",
+          "position": "bottom-right",
+          "transition": "flip"
+        })
       })
     },
     createObjective() {
@@ -160,8 +184,19 @@ export default {
         }
         this.allObjectives.unshift(resp.data)
         this.displayObjectives.unshift(resp.data)
+        toast("Objectif créé !", {
+          "theme": "dark",
+          "type": "success",
+          "position": "bottom-right",
+          "transition": "flip"
+        })
       }).catch((err) => {
-        console.log(err.response.data.errors)
+        toast(`${err.response.data.errors} !`, {
+          "theme": "dark",
+          "type": "error",
+          "position": "bottom-right",
+          "transition": "flip"
+        })
       })
     },
     showAllObjectives() {
@@ -175,7 +210,7 @@ export default {
       this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
     },
     createTimeEntry() {
-      if (this.createTimeEntryData.activity_id !== "" || this.createTimeEntryData.project_id !== "") {
+      if (this.createTimeEntryData.activity_id !== "" && this.createTimeEntryData.project_id !== "" && this.createTimeEntryData.end !== "" && this.createTimeEntryData.start !== "") {
         this.$api.post('time-entries', {
           project_id: this.createTimeEntryData.project_id,
           activity_id: this.createTimeEntryData.activity_id,
@@ -183,7 +218,9 @@ export default {
           start: this.createTimeEntryData.start.replace("T", " "),
           end: this.createTimeEntryData.end.replace("T", " ")
         }).then((resp) => {
-          // TODO : push dans activitiesToday si la date de début et de fin c ajrd
+          new Date(resp.data.end) === new Date() ?
+              this.timeEntriesToday.push(resp.data)
+              : null
           this.createTimeEntryData = {
             creating: false,
             activity_id: "",
@@ -193,8 +230,26 @@ export default {
             end: ""
           }
           this.getTimeEntriesToday()
+          toast("Entrée ajoutée !", {
+            "theme": "dark",
+            "type": "success",
+            "position": "bottom-right",
+            "transition": "flip"
+          })
         }).catch((err) => {
-          console.log(err)
+          toast(`${err.response.data.errors} !`, {
+            "theme": "dark",
+            "type": "error",
+            "position": "bottom-right",
+            "transition": "flip"
+          })
+        })
+      } else {
+        toast(`Définir un début et une fin !`, {
+          "theme": "dark",
+          "type": "error",
+          "position": "bottom-right",
+          "transition": "flip"
         })
       }
     },
@@ -210,8 +265,20 @@ export default {
           this.newTimeEntryData.activity_id = ""
           this.newTimeEntryData.project_id = ""
           this.newTimeEntryData.comment = ""
+          toast("Activité lancée !", {
+            "theme": "dark",
+            "type": "success",
+            "position": "bottom-right",
+            "transition": "flip"
+          })
         }).catch((err) => {
-          console.log(err.data)
+          toast(`${err.response.data.errors[0]} !</br>${err.response.data.errors[1]} !`, {
+            "theme": "dark",
+            "type": "error",
+            "position": "bottom-right",
+            "transition": "flip",
+            "dangerouslyHTMLString": true
+          })
         })
       }
     },

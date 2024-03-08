@@ -6,8 +6,9 @@
   <div class="modal-mask">
     <div class="modal-wrapper">
       <div class="popup">
-        <img src="/icons/cross.svg" alt="cross icon" @click="$emit('close')">
-        <slot></slot>
+        <img src="/icons/crossOrange.svg" alt="cross icon" @click="$emit('close')">
+        <div class="popup-title"><slot name="title"></slot></div>
+        <div class="popup-content"><slot name="content"></slot></div>
       </div>
     </div>
   </div>
@@ -34,7 +35,7 @@
   max-width: 25em;
   min-width: 20em;
 
-  background-color: white;
+  background-color: #323333;
   font-size: 1.1em;
   border-radius: 10px;
   padding: 1em;

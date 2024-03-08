@@ -341,48 +341,56 @@ export default {
   </div>
 
   <pop-up @close="newActivityData.creating = false" id="popupNewActivity" v-if="newActivityData.creating">
-    <div>Nouvelle activité :</div>
-    <input type="text" v-model="newActivityData.name" placeholder="Nom de l'activité">
-    <input type="color" v-model="newActivityData.color">
-    <button @click="createActivity">Créer l'activité</button>
+    <template #title>Nouvelle activité :</template>
+    <template #content>
+      <input type="text" v-model="newActivityData.name" placeholder="Nom de l'activité">
+      <input type="color" v-model="newActivityData.color">
+      <button @click="createActivity">Créer l'activité</button>
+    </template>
   </pop-up>
   <pop-up @close="newProjectData.creating = false" id="popupNewProject" v-if="newProjectData.creating">
-    <div>Nouveau projet :</div>
-    <input type="text" v-model="newProjectData.name" placeholder="Nom de du projet">
-    <input type="text" v-model="newProjectData.description" placeholder="Description du projet">
-    <button @click="createProject">Créer le projet</button>
+    <template #title>Nouveau projet :</template>
+    <template #content>
+      <input type="text" v-model="newProjectData.name" placeholder="Nom de du projet">
+      <input type="text" v-model="newProjectData.description" placeholder="Description du projet">
+      <button @click="createProject">Créer le projet</button>
+    </template>
   </pop-up>
   <pop-up @close="createTimeEntryData.creating = false" id="popupNewEntry" v-if="createTimeEntryData.creating">
-    <div>Nouvelle entrée :</div>
-    <div class="select-project">
-      <select v-model="createTimeEntryData.project_id" name="activity">
-        <option value="" selected disabled>Projet concerné</option>
-        <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
-      </select>
-    </div>
-    <div class="select-activity">
-      <select v-model="createTimeEntryData.activity_id" name="project">
-        <option value="" selected disabled>Type d'activité</option>
-        <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{
-            activity.name
-          }}
-        </option>
-      </select>
-    </div>
-    <div class="select-comment">
-      <input v-model="createTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
-    </div>
-    <div class="select-times">
-      <input v-model="createTimeEntryData.start" type="datetime-local" name="start">
-      <input v-model="createTimeEntryData.end" type="datetime-local" name="end">
-    </div>
-    <button @click="createTimeEntry">Ajouter</button>
+    <template #title>Nouvelle entrée :</template>
+    <template #content>
+      <div class="select-project">
+        <select v-model="createTimeEntryData.project_id" name="activity">
+          <option value="" selected disabled>Projet concerné</option>
+          <option v-for="project in enabledProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
+        </select>
+      </div>
+      <div class="select-activity">
+        <select v-model="createTimeEntryData.activity_id" name="project">
+          <option value="" selected disabled>Type d'activité</option>
+          <option v-for="activity in enabledActivities" :key="activity.id" :value="activity.id">{{
+              activity.name
+            }}
+          </option>
+        </select>
+      </div>
+      <div class="select-comment">
+        <input v-model="createTimeEntryData.comment" type="text" name="commentaire" placeholder="Commentaire">
+      </div>
+      <div class="select-times">
+        <input v-model="createTimeEntryData.start" type="datetime-local" name="start">
+        <input v-model="createTimeEntryData.end" type="datetime-local" name="end">
+      </div>
+      <button @click="createTimeEntry">Ajouter</button>
+    </template>
   </pop-up>
   <pop-up @close="newObjectiveData.creating = false" id="popupNewObjective" v-if="newObjectiveData.creating">
-    <div>Nouvel objectif :</div>
-    <input type="text" v-model="newObjectiveData.name" placeholder="Intitulé de l'objectif">
-    <input type="text" v-model="newObjectiveData.content" placeholder="Description de l'objectif">
-    <button @click="createObjective">Créer l'objectif</button>
+    <template #title>Nouvel objectif :</template>
+    <template #content>
+      <input type="text" v-model="newObjectiveData.name" placeholder="Intitulé de l'objectif">
+      <input type="text" v-model="newObjectiveData.content" placeholder="Description de l'objectif">
+      <button @click="createObjective">Créer l'objectif</button>
+    </template>
   </pop-up>
 
 

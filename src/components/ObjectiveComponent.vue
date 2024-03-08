@@ -1,4 +1,7 @@
 <script>
+import {toast} from "vue3-toastify";
+import ToastOptions from "../../toasts/toastOptions.js";
+
 export default {
   emits: ['update-objectives'],
   props: {
@@ -31,14 +34,16 @@ export default {
       if (this.objective.done === 0) {
         this.$api.patch(`/daily-objectives/${this.objective.id}/done`).then(() => {
           this.$emit('update-objectives')
+          toast.success(`Objectif fini !`, ToastOptions);
         }).catch((err) => {
-          console.log(err)
+          toast.error(`${err.response.data.errors} !`, ToastOptions);
         })
       } else {
         this.$api.patch(`/daily-objectives/${this.objective.id}/undone`).then(() => {
           this.$emit('update-objectives')
+          toast.success(`Objectif actif !`, ToastOptions);
         }).catch((err) => {
-          console.log(err)
+          toast.error(`${err.response.data.errors} !`, ToastOptions);
         })
       }
     }

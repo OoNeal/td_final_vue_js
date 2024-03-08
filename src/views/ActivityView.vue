@@ -345,16 +345,17 @@ export default {
     <template #content>
       <input type="text" v-model="newActivityData.name" placeholder="Nom de l'activité">
       <input type="color" v-model="newActivityData.color">
-      <button @click="createActivity">Créer l'activité</button>
     </template>
+    <template #button><span @click="createActivity">Créer l'activité</span></template>
+
   </pop-up>
   <pop-up @close="newProjectData.creating = false" id="popupNewProject" v-if="newProjectData.creating">
     <template #title>Nouveau projet :</template>
     <template #content>
       <input type="text" v-model="newProjectData.name" placeholder="Nom de du projet">
       <input type="text" v-model="newProjectData.description" placeholder="Description du projet">
-      <button @click="createProject">Créer le projet</button>
     </template>
+    <template #button><span @click="createProject">Créer le projet</span></template>
   </pop-up>
   <pop-up @close="createTimeEntryData.creating = false" id="popupNewEntry" v-if="createTimeEntryData.creating">
     <template #title>Nouvelle entrée :</template>
@@ -381,19 +382,18 @@ export default {
         <input v-model="createTimeEntryData.start" type="datetime-local" name="start">
         <input v-model="createTimeEntryData.end" type="datetime-local" name="end">
       </div>
-      <button @click="createTimeEntry">Ajouter</button>
     </template>
+    <template #button><span @click="createTimeEntry">Créer l'entrée</span></template>
   </pop-up>
   <pop-up @close="newObjectiveData.creating = false" id="popupNewObjective" v-if="newObjectiveData.creating">
     <template #title>Nouvel objectif :</template>
     <template #content>
       <input type="text" v-model="newObjectiveData.name" placeholder="Intitulé de l'objectif">
       <input type="text" v-model="newObjectiveData.content" placeholder="Description de l'objectif">
-      <button @click="createObjective">Créer l'objectif</button>
     </template>
+    <template #button><span @click="createObjective">Créer l'objectif</span></template>
+
   </pop-up>
-
-
 </template>
 
 <style scoped lang="scss">

@@ -6,9 +6,12 @@
   <div class="modal-mask">
     <div class="modal-wrapper">
       <div class="popup">
-        <img src="/icons/crossOrange.svg" alt="cross icon" @click="$emit('close')">
-        <div class="popup-title"><slot name="title"></slot></div>
-        <div class="popup-content"><slot name="content"></slot></div>
+        <div class="top">
+          <div class="title"><slot name="title"></slot></div>
+          <img src="/icons/crossOrange.svg" alt="cross icon" @click="$emit('close')">
+        </div>
+        <div class="content"><slot name="content"></slot></div>
+        <button><slot name="button"></slot></button>
       </div>
     </div>
   </div>
@@ -40,6 +43,37 @@
   border-radius: 10px;
   padding: 1em;
   margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+img {
+  height: 1em;
+  cursor: pointer;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2em;
+  font-weight: 600
+}
+
+button {
+  border: none;
+  width: fit-content;
+  background-color: unset;
+  color: #ECBA07;
+  font-size: 1em;
+  font-weight: 300;
+  text-align: center;
+  margin: 0 auto;
+  &:hover {
+    color: darken(#ECBA07, 7%)
+  }
 }
 
 </style>

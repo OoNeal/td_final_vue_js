@@ -289,7 +289,7 @@ export default {
       </div>
 
       <div class="infos time-entries">
-        <div class="title">Liste des {{ this.displayedTimeEntries.length }} entrées :</div>
+        <div class="title">Liste des entrées ( {{ this.displayedTimeEntries.length }} ):</div>
         <div class="entries">
           <transition-group name="fade">
             <time-entry @update-entries="updateView" :entry="timeEntry" v-for="timeEntry in sortTimesEntries()"

@@ -338,7 +338,6 @@ export default {
           </div>
           <div v-if="displayObjectives.length > 0" class="objectives-list">
             <div class="title">Liste des objectifs :</div>
-
             <transition-group name="fade">
               <objective @update-objectives="getObjectives" :objective="objective"
                          v-for="objective in displayObjectives"

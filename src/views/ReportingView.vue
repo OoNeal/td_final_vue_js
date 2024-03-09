@@ -258,7 +258,7 @@ export default {
       </div>
     </div>
 
-    <h2>Sur cette période, vous avez travaillé pendant <span class="time">{{ this.workingHours }}</span></h2>
+    <h2 v-if="workingHours !== 0">Sur cette période, vous avez travaillé pendant <span class="time">{{ this.workingHours }}</span></h2>
 
     <div v-if="this.displayedTimeEntries.length > 0" class="data">
       <div class="infos charts">
@@ -285,10 +285,10 @@ export default {
         </div>
       </div>
     </div>
-    <div v-else-if="projectId === ''">
+    <div class="no-data" v-else-if="projectId !== ''">
       Aucune entrée ne correspond à la période et au projet choisi...
     </div>
-    <div v-else>Aucune entrée n'a été enregistrée sur cette période...</div>
+    <div class="no-data" v-else>Aucune entrée n'a été enregistrée sur cette période...</div>
   </main>
 </template>
 
@@ -311,8 +311,14 @@ export default {
 }
 
 main {
-  overflow: hidden;
   padding: 2em 2em 1em;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 300;
+  margin-top: 1em;
 }
 
 .top {

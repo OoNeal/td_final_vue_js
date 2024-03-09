@@ -19,14 +19,14 @@ export default {
     return {
       isEnabled: this.item.is_enabled === 1,
       isEditing: false,
-      editItem: {},
+      editItem: {}
     }
   },
   methods: {
     getItemData() {
       console.log(this.item)
       this.editItem = {
-        name : this.item.name,
+        name: this.item.name
       }
       if (this.isProject) {
         this.editItem.description = this.item.description
@@ -55,7 +55,7 @@ export default {
       })
     },
     saveItem() {
-      this.toggleEditing();
+      this.toggleEditing()
       this.$api.put(`${this.isProject ? 'projects' : 'activities'}/${this.item.id}`, this.editItem).then(() => {
         console.log(`${this.item.name} mis à jour`)
         this.$emit('update-view')
@@ -63,15 +63,27 @@ export default {
         console.log(err)
       })
     }
+  },
+  directives: {
+    is_enabled: {
+      mounted(el, binding) {
+        binding.value === 1 || binding.value === true ?
+          el.style.backgroundColor = '#ECBA07'
+          : el.style.backgroundColor = '#212121'
+      },
+      updated(el, binding) {
+        binding.value === 1 || binding.value === true ?
+          el.style.backgroundColor = '#ECBA07'
+          : el.style.backgroundColor = '#212121'
+      }
+    }
   }
 }
 </script>
 
 <template>
   <div class="item">
-    <div class="item_checkbox">
-      <input type="checkbox" v-model="isEnabled" @click="toggleEnabled" />
-    </div>
+    <div class="item_checkbox" v-is_enabled="item.is_enabled" @click="toggleEnabled" />
     <div class="item_content">
       <h2>{{ item.name }}</h2>
       <p v-if="isProject">{{ item.description }}</p>
@@ -91,7 +103,7 @@ export default {
           </div>
           <div v-if="isProject" class="label">
             <label for="description">Description</label>
-            <textarea name="description" v-model="editItem.description"/>
+            <textarea name="description" v-model="editItem.description" />
           </div>
           <div v-else class="label color">
             <label for="color">Couleur associée :</label>
@@ -107,8 +119,31 @@ export default {
 <style scoped lang="scss">
 
 .item {
+  margin: 1em 0;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #D4DFD8;
 
+  &_checkbox {
+    width: 1.3em;
+    height: 1.3em;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #212121;
+    border: #D4DFD8 1px solid;
+  }
+
+  &_content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 }
+
 .actions-icons {
   display: flex;
   gap: 1em;
@@ -173,15 +208,18 @@ export default {
   ::-webkit-color-swatch-wrapper {
     padding: 0;
   }
-  ::-webkit-color-swatch{
+
+  ::-webkit-color-swatch {
     border: 0;
     border-radius: 0;
   }
+
   ::-moz-color-swatch,
-  ::-moz-focus-inner{
+  ::-moz-focus-inner {
     border: 0;
   }
-  ::-moz-focus-inner{
+
+  ::-moz-focus-inner {
     padding: 0;
   }
 

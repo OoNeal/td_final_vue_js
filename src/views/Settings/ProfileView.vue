@@ -1,5 +1,8 @@
 <script>
 
+import { useUserProfileStore } from '@/stores/UserProfile.js'
+import { mapActions } from 'pinia'
+
 export default {
   data() {
     return {
@@ -11,14 +14,18 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useUserProfileStore, ['setName']),
     getProfile() {
       return this.$api.get('profile').then((resp) => {
-        return resp.data
+        const profile = resp.data
+        this.setName(profile.name)
+        return profile
       })
     },
     updateUser() {
       return this.$api.put('profile', this.user).then((resp) => {
         console.log('user updated')
+        this.setName(this.user.name)
         return resp.data
       })
     }

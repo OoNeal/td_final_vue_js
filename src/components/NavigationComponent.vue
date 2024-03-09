@@ -5,6 +5,8 @@ import {useAllObjectivesStore} from "@/stores/allObjectives.js";
 import { useUserProfileStore } from '@/stores/UserProfile.js'
 import SideBarComponent from '@/components/SideBarComponent.vue'
 import { useAuthStore } from '@/stores/Auth.js'
+import { toast } from 'vue3-toastify'
+import ToastOptions from '../../toasts/toastOptions.js'
 
 export default {
   components: { SideBarComponent },

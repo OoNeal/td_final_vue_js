@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-      visible: false
+      visible: false,
     }
   },
   methods: {
@@ -26,7 +26,7 @@ export default {
 </script>
 
 <template>
-  <div class="link" v-if="inHeader" @click="toggle" :class="{link_active : visible}">
+  <div class="link" v-if="inHeader" @click="toggle" :class="{link_active : visible || this.$route.path.includes('settings')}">
     <slot name="link"></slot>
   </div>
   <div v-else @click="toggle" class="mini-nav" :class="[{visible : !visible}, position]">
@@ -42,6 +42,9 @@ export default {
         <div class="button">
           <slot class="button" name="button"></slot>
         </div>
+      </div>
+      <div v-if="inHeader"  class="sidenav-content" @click="toggle">
+        <slot name="content"></slot>
       </div>
       <div class="sidenav-content">
         <slot name="content"></slot>

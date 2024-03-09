@@ -333,7 +333,7 @@ export default {
                        class="objective" :key="objective.id"/>
           </div>
           <div v-else>
-            <p v-if="objectives">Tous les objectifs d'aujourd'hui ont été atteints !</p>
+            <p v-if="objectives.length > 0">Tous les objectifs d'aujourd'hui ont été atteints !</p>
             <p v-else>Aucun objectif défini pour aujourd'hui... </p>
           </div>
         </div>

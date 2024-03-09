@@ -38,7 +38,7 @@ export default {
       projectId: '',
       projects: [],
 
-      display: 1,
+      display: 0,
 
       projectData: {
         labels: [],
@@ -92,6 +92,7 @@ export default {
       })
     },
     getData: function () {
+      this.display = 0
       let workingHours = 0
       let projectHours = {}
       let activityHours = {}
@@ -102,6 +103,9 @@ export default {
         let start = new Date(entry.start)
         let end = new Date(entry.end)
         let hours = (end - start) / 1000 / 60 / 60
+        if (hours > 1) {
+          this.display = 1
+        }
         workingHours += hours
         this.workingHours = this.formatWorkingHours(workingHours)
 
@@ -272,12 +276,16 @@ export default {
           <h3>Heures de travail / <strong>projet</strong></h3>
           <button @click="display = 1">Afficher par activité</button>
         </div>
+        <div v-if="display === 0" class="no_infos">
+          Pas assez de données pour les afficher dans un graphique... :(
+        </div>
         <div v-if="display === 1" class="chart">
           <DoughnutChart class="chart-size" :chart-data="this.activityData"/>
         </div>
         <div v-if="display === 2" class="chart">
           <DoughnutChart class="chart-size" :chart-data="this.projectData"/>
         </div>
+
       </div>
 
       <div class="infos time-entries">
@@ -334,6 +342,17 @@ main {
   .datepicker-size {
     font-family: inherit;
   }
+}
+
+.no_infos {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-weight: 200;
+  font-size: 1.5em;
+  color: #ECBA07;
 }
 
 h1 {

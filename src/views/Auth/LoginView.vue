@@ -1,6 +1,9 @@
 <script>
 import { useAuthStore } from '@/stores/Auth.js'
 import { mapActions, mapState } from 'pinia'
+import { useUserProfileStore } from '@/stores/UserProfile.js'
+import { toast } from 'vue3-toastify'
+import ToastOptions from '../../../toasts/toastOptions.js'
 
 export default {
   computed: {
@@ -9,28 +12,27 @@ export default {
   },
   data() {
     return {
-      userKey: '',
-      errors: []
+      userKey: ''
     }
   },
   methods: {
     ...mapActions(useAuthStore, ['setApiKey']),
+    ...mapActions(useUserProfileStore, ['setName']),
     login() {
-      this.errors = []
-      if (this.apiKey !== this.userKey && this.apiKey === null) {
-        this.$api.get('profile', {
-          headers: {
-            Authorization: `key=${this.userKey}`
-          }
-        }).then(() => {
-          this.setApiKey(this.userKey)
-          this.$router.push(this.returnUrl || '/')
-        }).catch(() => {
-          this.errors.push('Clé invalide')
-        })
-      } else {
-        this.$router.push(this.returnUrl || '/')
-      }
+      this.setApiKey(this.userKey)
+      console.log('apiKey', this.apiKey)
+      this.$api.get('profile', {
+        headers: {
+          'Authorization': `key=${this.userKey}`
+        }
+      }).then((resp) => {
+        console.log('resp', resp.data.name)
+        this.setName(resp.data.name)
+        this.$router.push('/')
+      }).catch((err) => {
+        console.log(err)
+        toast.error('La clé d\'api est incorrecte', ToastOptions)
+      })
     }
   }
 }

@@ -24,7 +24,6 @@ export default {
     },
     updateUser() {
       return this.$api.put('profile', this.user).then((resp) => {
-        console.log('user updated')
         this.setName(this.user.name)
         return resp.data
       })

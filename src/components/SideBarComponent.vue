@@ -1,10 +1,10 @@
 <script>
 export default {
   props: {
-    canClose: {
+    inHeader: {
       type: Boolean,
       required: false,
-      default: true
+      default: false
     },
     position: {
       type: String,
@@ -26,16 +26,19 @@ export default {
 </script>
 
 <template>
-  <div v-if="canClose" @click="toggle" class="mini-nav" :class="{visible : !visible}">
+  <div class="link" v-if="inHeader" @click="toggle" :class="{link_active : visible}">
+    <slot name="link"></slot>
+  </div>
+  <div v-else @click="toggle" class="mini-nav" :class="{visible : !visible}">
     <div class="button">
       <slot name="button"></slot>
     </div>
-    <img src="/icons/plusOrange.svg" alt="plus icon">
+    <img src="/icons/light-arrow.svg" alt="arrow">
   </div>
   <transition :name="position">
     <section v-if="visible" class="sidenav" :class="position">
       <div class="top">
-        <img v-if="canClose" src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
+        <img src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
         <div class="button">
           <slot class="button" name="button"></slot>
         </div>
@@ -49,8 +52,19 @@ export default {
 
 <style scoped lang="scss">
 
+.link {
+  cursor: pointer;
+
+  &_active {
+    color: #ECBA07;
+    font-weight: 500;
+  }
+}
+
+
 .mini-nav {
-  background-color: black;
+  background-color: rgba(black, 0.15);
+  backdrop-filter: blur(15px);
   width: fit-content;
   display: flex;
   flex-direction: row;
@@ -61,9 +75,17 @@ export default {
   border-radius: 5px;
   cursor: pointer;
 
-  img {
-    height: 1em;
+  &.right {
+    flex-direction: row-reverse;
   }
+  img {
+    height: 0.8em;
+
+    &.right {
+      transform: rotate(180deg);
+    }
+  }
+
 }
 
 .sidenav {

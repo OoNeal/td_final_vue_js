@@ -116,12 +116,9 @@ export default {
         this.setObjectives(resp.data)
         if (this.showObjectivesDone) {
           this.displayObjectives = resp.data
-          console.log("show all", this.showObjectivesDone, this.displayObjectives)
         } else {
           this.displayObjectives = resp.data.filter(objective => objective.done === 0);
-          console.log("show pas done", this.showObjectivesDone, this.displayObjectives)
         }
-        //this.hideObjectivesDone()
       }).catch((err) => {
         console.log(err)
       })
@@ -317,8 +314,10 @@ export default {
           </div>
           <div v-if="displayTimeEntriesToday.length > 0" class="activities-list">
             <div class="title">Liste des activités :</div>
-            <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
-                        :entry="entry"/>
+            <transition-group name="fade">
+              <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
+                          :entry="entry"/>
+            </transition-group>
           </div>
           <div v-else>Pas de Time Entry à afficher.</div>
         </div>
@@ -340,7 +339,7 @@ export default {
           <div v-if="displayObjectives.length > 0" class="objectives-list">
             <div class="title">Liste des objectifs :</div>
 
-            <transition-group name="fade" tag="div" class="objective-container">
+            <transition-group name="fade">
               <objective @update-objectives="getObjectives" :objective="objective"
                          v-for="objective in displayObjectives"
                          class="objective" :key="objective.id"/>
@@ -699,14 +698,4 @@ select {
     width: inherit;
   }
 }
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
-}
-
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
-  opacity: 0;
-}
-
 </style>

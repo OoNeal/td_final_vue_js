@@ -258,13 +258,15 @@ export default {
       </div>
     </div>
 
-    <h2 v-if="workingHours !== 0">Sur cette période, vous avez travaillé pendant <span class="time">{{ this.workingHours }}</span></h2>
+    <h2 v-if="workingHours !== 0">Sur cette période, vous avez travaillé pendant <span class="time">{{
+        this.workingHours
+      }}</span></h2>
 
     <div v-if="this.displayedTimeEntries.length > 0" class="data">
       <div class="infos charts">
         <div class="top" v-if="display === 1">
           <h3>Heures de travail / <strong>activité</strong></h3>
-          <button v-if="projectId === ''" @click="display = 2" >Afficher par projet</button>
+          <button v-if="projectId === ''" @click="display = 2">Afficher par projet</button>
         </div>
         <div class="top" v-else-if="display === 2">
           <h3>Heures de travail / <strong>projet</strong></h3>
@@ -279,9 +281,12 @@ export default {
       </div>
 
       <div class="infos time-entries">
-        <div class="title">Liste des {{ this.displayedTimeEntries.length }} entrées : </div>
+        <div class="title">Liste des {{ this.displayedTimeEntries.length }} entrées :</div>
         <div class="entries">
-          <TimeEntry @update-entries="updateView" :entry="timeEntry" v-for="timeEntry in sortTimesEntries()" :key="timeEntry.id"/>
+          <transition-group name="fade">
+            <time-entry @update-entries="updateView" :entry="timeEntry" v-for="timeEntry in sortTimesEntries()"
+                        :key="timeEntry.id"/>
+          </transition-group>
         </div>
       </div>
     </div>
@@ -344,6 +349,7 @@ h1 {
   display: flex;
   gap: .25em;
   align-items: center;
+
   div {
     text-transform: uppercase;
     color: #ECBA07;
@@ -383,6 +389,7 @@ h2 {
   font-weight: 250;
   margin: 1em 0;
   text-align: center;
+
   .time {
     font-weight: 500;
   }
@@ -394,7 +401,7 @@ h2 {
 }
 
 .infos {
-  flex-basis : 50vw;
+  flex-basis: 50vw;
 }
 
 .charts {
@@ -409,8 +416,10 @@ h2 {
     font-size: 1em;
   }
 }
+
 .time-entries {
   padding-left: 1em;
+
   .title {
     text-transform: uppercase;
     text-decoration: underline;
@@ -419,6 +428,7 @@ h2 {
     font-weight: 200;
     margin-bottom: 1em;
   }
+
   .entries {
     overflow-y: scroll;
     height: 57vh;

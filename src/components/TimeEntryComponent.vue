@@ -23,13 +23,13 @@ export default {
     this.$api.get(`projects/${this.entry.project_id}`).then((resp) => {
       this.project = resp.data.name
     }).catch((err) => {
-      console.log(err)
+      toast.error(`${err.response.data.errors} !`, ToastOptions);
     })
     this.$api.get(`activities/${this.entry.activity_id}`).then((resp) => {
       this.activity = resp.data.name
       this.color = resp.data.color
     }).catch((err) => {
-      console.log(err)
+      toast.error(`${err.response.data.errors} !`, ToastOptions);
     })
   },
   computed: {

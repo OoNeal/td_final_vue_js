@@ -67,7 +67,7 @@ export default {
         this.timeEntries = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
         this.calcHoursWorked()
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     getProfile(){
@@ -87,7 +87,7 @@ export default {
           this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
         }
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
 
       this.getCurrentActivity()

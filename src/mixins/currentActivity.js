@@ -18,7 +18,7 @@ const currentActivity = {
             this.$api.get('time-entries?end=').then((resp) => {
                 resp.data[0] ? (this.setCurrentTimeEntry(resp.data[0])) : null
             }).catch((err) => {
-                console.log(err)
+                toast.error(`${err.response.data.errors} !`, ToastOptions);
             })
         },
         stopActivity() {
@@ -33,8 +33,6 @@ const currentActivity = {
         calcTimeSince() {
             if (this.currentTimeEntry !== null) {
                 const date = new Date(this.currentTimeEntry.start);
-                console.log('date', date)
-                console.log('new Date()', new Date())
                 const difference = new Date().getTime() - date.getTime() < 0 ? 0 : new Date().getTime() - date.getTime();
                 const jours = Math.floor(difference / (1000 * 60 * 60 * 24));
                 const heures = Math.floor(difference / (1000 * 60 * 60));

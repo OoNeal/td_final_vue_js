@@ -28,8 +28,7 @@ export default {
         this.setName(resp.data.name)
         location.reload()
         this.setApiKey(this.userKey)
-      }).catch((err) => {
-        console.log(err)
+      }).catch( => {
         toast.error('La clé d\'api est incorrecte', ToastOptions)
       })
     }

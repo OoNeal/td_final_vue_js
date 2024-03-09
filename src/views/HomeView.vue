@@ -88,13 +88,13 @@ export default {
       this.allProjects = resp.data
       this.enabledProjects = resp.data.filter(project => project.is_enabled === 1);
     }).catch((err) => {
-      console.log(err)
+      toast.error(`${err.response.data.errors} !`, ToastOptions);
     })
     this.$api.get('activities').then((resp) => {
       this.allActivities = resp.data
       this.enabledActivities = resp.data.filter(activity => activity.is_enabled === 1);
     }).catch((err) => {
-      console.log(err)
+      toast.error(`${err.response.data.errors} !`, ToastOptions);
     })
     this.objectives = this.allObjectives
     this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
@@ -108,7 +108,7 @@ export default {
         this.timeEntriesToday = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
         this.displayTimeEntriesToday = this.timeEntriesToday
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     getObjectives() {
@@ -120,7 +120,7 @@ export default {
           this.displayObjectives = resp.data.filter(objective => objective.done === 0);
         }
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     createActivity() {

@@ -27,7 +27,6 @@ export default {
   },
   methods: {
     getItemData() {
-      console.log(this.item)
       this.editItem = {
         name: this.item.name
       }

@@ -2,6 +2,8 @@
 
 import {defineComponent} from 'vue'
 import ListItem from '@/components/ListItemComponent.vue'
+import { toast } from 'vue3-toastify'
+import ToastOptions from '../../../toasts/toastOptions.js'
 
 export default defineComponent({
   components: {ListItem},
@@ -10,14 +12,14 @@ export default defineComponent({
       this.$api.get('activities').then((resp) => {
         this.activities = resp.data.sort((a, b) => b.is_enabled - a.is_enabled)
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     getFilteredActivities() {
       this.$api.get('activities', {params: {keywords: this.keywords}}).then((resp) => {
         this.activities = resp.data
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     }
   },

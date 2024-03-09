@@ -18,7 +18,6 @@ export const useUserProfileStore = defineStore('userProfile', {
   actions: {
     setName(name) {
       this.name = name
-      console.log(this.name)
     }
   }
 })

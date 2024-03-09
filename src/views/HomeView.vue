@@ -114,8 +114,14 @@ export default {
     getObjectives() {
       this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
         this.setObjectives(resp.data)
-        this.displayObjectives = resp.data.filter(objective => objective.done === 0);
-        this.hideObjectivesDone()
+        if (this.showObjectivesDone) {
+          this.displayObjectives = resp.data
+          console.log("show all", this.showObjectivesDone, this.displayObjectives)
+        } else {
+          this.displayObjectives = resp.data.filter(objective => objective.done === 0);
+          console.log("show pas done", this.showObjectivesDone, this.displayObjectives)
+        }
+        //this.hideObjectivesDone()
       }).catch((err) => {
         console.log(err)
       })
@@ -269,7 +275,11 @@ export default {
     },
     allObjectives() {
       this.objectives = this.allObjectives
-      this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+      if (this.showObjectivesDone) {
+        this.displayObjectives = this.objectives
+      } else {
+        this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+      }
     }
   },
 }
@@ -329,8 +339,13 @@ export default {
           </div>
           <div v-if="displayObjectives.length > 0" class="objectives-list">
             <div class="title">Liste des objectifs :</div>
-            <objective @update-objectives="getObjectives" :objective="objective" v-for="objective in displayObjectives"
-                       class="objective" :key="objective.id"/>
+
+            <transition-group name="fade" tag="div" class="objective-container">
+              <objective @update-objectives="getObjectives" :objective="objective"
+                         v-for="objective in displayObjectives"
+                         class="objective" :key="objective.id"/>
+            </transition-group>
+
           </div>
           <div v-else>
             <p v-if="objectives.length > 0">Tous les objectifs d'aujourd'hui ont été atteints !</p>
@@ -685,5 +700,13 @@ select {
   }
 }
 
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
+{
+  opacity: 0;
+}
 
 </style>

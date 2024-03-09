@@ -1,5 +1,7 @@
 <script>
 import PopUp from '@/components/PopUpComponent.vue'
+import {toast} from "vue3-toastify";
+import ToastOptions from "../../toasts/toastOptions.js";
 
 export default {
   components: {
@@ -48,19 +50,19 @@ export default {
 
     editEnabling() {
       this.$api.patch(`${this.isProject ? 'projects' : 'activities'}/${this.item.id}/${this.isEnabled ? 'enable' : 'disable'}`).then(() => {
-        console.log(`${this.item.name} mis à jour`)
+        toast.success(`${this.item.name} mis à jour`, ToastOptions);
         this.$emit('update-view')
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     },
     saveItem() {
       this.toggleEditing()
       this.$api.put(`${this.isProject ? 'projects' : 'activities'}/${this.item.id}`, this.editItem).then(() => {
-        console.log(`${this.item.name} mis à jour`)
+        toast.success(`${this.item.name} mis à jour`, ToastOptions);
         this.$emit('update-view')
       }).catch((err) => {
-        console.log(err)
+        toast.error(`${err.response.data.errors} !`, ToastOptions);
       })
     }
   },

@@ -4,6 +4,7 @@ import {mapActions, mapState} from 'pinia'
 import {useAllObjectivesStore} from "@/stores/allObjectives.js";
 import {toast} from "vue3-toastify";
 import ToastOptions from "../../toasts/toastOptions.js";
+import { useUserProfileStore } from '@/stores/UserProfile.js'
 
 export default {
   mixins: [currentActivity],
@@ -27,6 +28,7 @@ export default {
     isOnActivity() {
       return this.$route.path === "/"
     },
+    ...mapState(useUserProfileStore, ['name']),
     ...mapState(useAllObjectivesStore, ['allObjectives']),
   },
   methods: {
@@ -88,6 +90,9 @@ export default {
     allObjectives() {
       this.objectives = this.allObjectives
       this.objectivesDone = this.allObjectives.filter((obj) => obj.done)
+    },
+    name() {
+      this.user = this.name
     }
   }
 }
@@ -117,7 +122,7 @@ export default {
     <nav>
       <RouterLink to="/">Activité</RouterLink>
       <RouterLink to="/reporting">Statistiques</RouterLink>
-      <RouterLink to="/settings">Paramètres</RouterLink>
+      <RouterLink to="/settings/profile">Paramètres</RouterLink>
     </nav>
     <RouterLink class="profile" to="/settings/profile">
       <div>{{ user }}</div>

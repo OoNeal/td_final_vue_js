@@ -5,6 +5,10 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
+    },
+    {
       path:'/',
       component: () => import('@/views/HomeView.vue'),
     },
@@ -29,11 +33,30 @@ const router = createRouter({
       path: '/reporting',
       component: () => import('@/views/ReportingView.vue'),
     },
+    {
+      path: '/settings',
+      component: () => import('@/views/Settings/SettingsView.vue'),
+      children: [
+        {
+          path: 'profile',
+          component: () => import('@/views/Settings/ProfileView.vue'),
+        },
+        {
+          path: 'project',
+          component: () => import('@/views/Settings/ProjectView.vue'),
+        },
+        {
+          path: 'activity',
+          component: () => import('@/views/Settings/ActivityView.vue'),
+        }
+      ]
+    }
   ]
 });
 
 router.beforeEach(async (to) => {
-  const publicPages = ['/auth/login', '/auth/register'];
+  if (to.path === '/settings') return '/settings/profile';
+  const publicPages = ['/auth', '/auth/', '/auth/login', '/auth/register'];
   const authRequired = !publicPages.includes(to.path);
   const store = useAuthStore();
 
@@ -41,7 +64,8 @@ router.beforeEach(async (to) => {
     store.$patch({ returnUrl: to.path });
     return '/auth/login';
   } else if (!authRequired && store.apiKey !== null) {
-    return '/';
+    console.log('Redirecting to /');
+    return '';
   }
 });
 

@@ -1,7 +1,7 @@
 <script>
 
 import { defineComponent } from 'vue'
-import ListItem from '@/components/ListItem.vue'
+import ListItem from '@/components/ListItemComponent.vue'
 
 export default defineComponent({
   components: { ListItem },

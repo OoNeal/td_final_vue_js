@@ -117,7 +117,7 @@ export default {
     <nav>
       <RouterLink to="/">Activité</RouterLink>
       <RouterLink to="/reporting">Statistiques</RouterLink>
-      <RouterLink to="/settings">Paramètres</RouterLink>
+      <RouterLink to="/settings/profile">Paramètres</RouterLink>
     </nav>
     <RouterLink class="profile" to="/settings/profile">
       <div>{{ user }}</div>

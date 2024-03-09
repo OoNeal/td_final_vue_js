@@ -17,6 +17,7 @@ export const useAllObjectivesStore = defineStore('allObjectives', {
     },
     actions: {
         setObjectives(objectives) {
+            objectives.sort((a, b) => a.done - b.done);
             this.allObjectives = objectives
         },
         addObjective(objective) {

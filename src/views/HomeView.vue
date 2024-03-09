@@ -114,8 +114,11 @@ export default {
     getObjectives() {
       this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
         this.setObjectives(resp.data)
-        this.displayObjectives = resp.data.filter(objective => objective.done === 0);
-        this.hideObjectivesDone()
+        if (this.showObjectivesDone) {
+          this.displayObjectives = resp.data
+        } else {
+          this.displayObjectives = resp.data.filter(objective => objective.done === 0);
+        }
       }).catch((err) => {
         console.log(err)
       })
@@ -269,7 +272,11 @@ export default {
     },
     allObjectives() {
       this.objectives = this.allObjectives
-      this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+      if (this.showObjectivesDone) {
+        this.displayObjectives = this.objectives
+      } else {
+        this.displayObjectives = this.allObjectives.filter(objective => objective.done === 0);
+      }
     }
   },
 }
@@ -307,8 +314,10 @@ export default {
           </div>
           <div v-if="displayTimeEntriesToday.length > 0" class="activities-list">
             <div class="title">Liste des activités :</div>
-            <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
-                        :entry="entry"/>
+            <transition-group name="fade">
+              <time-entry @update-entries="getTimeEntriesToday" v-for="entry in displayTimeEntriesToday" :key="entry.id"
+                          :entry="entry"/>
+            </transition-group>
           </div>
           <div v-else>Pas de Time Entry à afficher.</div>
         </div>
@@ -329,11 +338,15 @@ export default {
           </div>
           <div v-if="displayObjectives.length > 0" class="objectives-list">
             <div class="title">Liste des objectifs :</div>
-            <objective @update-objectives="getObjectives" :objective="objective" v-for="objective in displayObjectives"
-                       class="objective" :key="objective.id"/>
+            <transition-group name="fade">
+              <objective @update-objectives="getObjectives" :objective="objective"
+                         v-for="objective in displayObjectives"
+                         class="objective" :key="objective.id"/>
+            </transition-group>
+
           </div>
           <div v-else>
-            <p v-if="objectives">Tous les objectifs d'aujourd'hui ont été atteints !</p>
+            <p v-if="objectives.length > 0">Tous les objectifs d'aujourd'hui ont été atteints !</p>
             <p v-else>Aucun objectif défini pour aujourd'hui... </p>
           </div>
         </div>
@@ -684,6 +697,4 @@ select {
     width: inherit;
   }
 }
-
-
 </style>

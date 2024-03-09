@@ -29,3 +29,14 @@ input:focus {
     flex-direction: column;
 }
 
+
+.fade-enter-active {
+    transition: opacity 0.5s;
+}
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+

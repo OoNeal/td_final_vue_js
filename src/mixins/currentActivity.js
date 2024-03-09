@@ -1,5 +1,7 @@
 import {useCurrentActivityStore} from "@/stores/CurrentActivity.js";
 import {mapActions, mapState} from 'pinia'
+import {toast} from "vue3-toastify";
+import ToastOptions from "../../toasts/toastOptions.js";
 
 const currentActivity = {
     data() {
@@ -23,8 +25,9 @@ const currentActivity = {
             this.$api.patch(`time-entries/${this.currentTimeEntry.id}/stop`).then(() => {
                 this.deleteCurrentTimeEntry()
                 this.timer = null
+                toast.success(`Activité arrêtée !`, ToastOptions);
             }).catch((err) => {
-                console.log(err.response.data)
+                toast.error(`${err.response.data.errors} !`, ToastOptions);
             })
         },
         calcTimeSince() {

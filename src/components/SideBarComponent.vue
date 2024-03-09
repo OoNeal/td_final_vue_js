@@ -41,17 +41,19 @@ export default {
     </div>
     <img v-position="position" src="/icons/light-arrow.svg" alt="arrow">
   </div>
-  <section v-position="position" class="sidenav" :class="{visible: visible}">
-    <div class="top">
-      <img src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
-      <div class="button">
-        <slot class="button" name="button"></slot>
+  <transition :name="position">
+    <section v-position="position" class="sidenav" :class="{visible: visible}">
+      <div class="top">
+        <img src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
+        <div class="button">
+          <slot class="button" name="button"></slot>
+        </div>
       </div>
-    </div>
-    <div class="sidenav-content">
-      <slot name="content"></slot>
-    </div>
-  </section>
+      <div class="sidenav-content">
+        <slot name="content"></slot>
+      </div>
+    </section>
+  </transition>
 </template>
 
 <style scoped lang="scss">
@@ -99,13 +101,18 @@ export default {
   position: absolute;
   z-index: 1000;
   top: 0;
-  background-color: rgba(24,24,24,0.7);
+  background-color: rgba(24, 24, 24, 0.7);
   backdrop-filter: blur(15px);
   height: 100%;
   transition: all 0.5s ease;
   overflow-y: scroll;
   overflow-x: hidden;
-  //padding-top: 13vh;
+
+  .sidenav-content {
+    box-sizing: border-box;
+    padding: 1em;
+    margin-top: 14vh;
+  }
 
   .top {
     background-color: #181818;
@@ -138,37 +145,51 @@ export default {
 
 }
 
-.sidenav-content {
-  box-sizing: border-box;
-  padding: 1em;
-  margin-top: 14vh;
-}
-
 .sidenav.left {
-  left: -40vw;
+  left: 0;
+  border-right: 1px solid #D4DFD8;
   .top {
     align-items: flex-end;
   }
 }
 
 .sidenav.right {
-  right: -40vw;
+  right: 0;
+  border-left: 1px solid #D4DFD8;
   .top {
     align-items: flex-start;
   }
 }
 
-.sidenav.right.visible {
-  right: 0;
-  transition: all 0.5s ease;
-  border-left: 1px solid #D4DFD8;
+.left-enter-from {
+  transform: translateX(-40vw);
 }
 
-.sidenav.left.visible {
-  left: 0;
-  transition: all 0.5s ease;
-  border-right: 1px solid #D4DFD8;
+.left-enter-active {
+  transition: all .4s ease-in;
 }
 
+.left-leave-active {
+  transition: all .4s ease-in;
+}
+.left-leave-to {
+  transform: translateX(-40vw);
+}
+
+
+.right-enter-from {
+  transform: translateX(40vw);
+}
+
+.right-enter-active {
+  transition: all .4s ease-in;
+}
+
+.right-leave-active {
+  transition: all .4s ease-in;
+}
+.right-leave-to {
+  transform: translateX(40vw);
+}
 
 </style>

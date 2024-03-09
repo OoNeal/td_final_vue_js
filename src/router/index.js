@@ -64,7 +64,6 @@ router.beforeEach(async (to) => {
     store.$patch({ returnUrl: to.path });
     return '/auth/login';
   } else if (!authRequired && store.apiKey !== null) {
-    console.log('Redirecting to /');
     return '';
   }
 });

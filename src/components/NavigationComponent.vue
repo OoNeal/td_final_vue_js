@@ -33,12 +33,16 @@ export default {
     },
     ...mapState(useUserProfileStore, ['name']),
     ...mapState(useAllObjectivesStore, ['allObjectives']),
+    ...mapState(useAuthStore, ['apiKey']),
   },
   methods: {
     ...mapActions(useAllObjectivesStore, ['setObjectives']),
     ...mapActions(useAuthStore, ['setApiKey']),
+    ...mapActions(useUserProfileStore, ['setName']),
     logout() {
+      location.reload()
       this.setApiKey(null)
+      this.setName('')
     },
     calcHoursWorked() {
       const today = new Date().toISOString().slice(0, 10);
@@ -60,23 +64,23 @@ export default {
     },
     getTimeEntries() {
       this.$api.get('time-entries').then((resp) => {
-        //je fais la même dans activity view donc à factoriser ??? mais ds le store c bad chiant
-        //il faut prendre l'activité actuelle aussi ?
         this.timeEntries = resp.data.filter(entry => entry.end && entry.end.split(' ')[0] === new Date().toISOString().slice(0, 10));
         this.calcHoursWorked()
       }).catch((err) => {
         console.log(err)
       })
+    },
+    getProfile(){
+      this.$api.get('profile').then((resp) => {
+        this.user = resp.data.name
+      }).catch(() => {
+        toast.error('Erreur lors de la récupération du profil', ToastOptions);
+      })
     }
   },
   created() {
     if (this.connected) {
-      this.$api.get('profile').then((resp) => {
-        this.user = resp.data.name
-      }).catch((err) => {
-        console.log(err)
-      })
-
+      this.getProfile();
       this.$api.get(`daily-objectives?date=${new Date().toISOString().slice(0, 10)}`).then((resp) => {
         if (resp.data.length > 0) {
           this.setObjectives(resp.data)
@@ -100,7 +104,8 @@ export default {
     },
     name() {
       this.user = this.name
-    }
+    },
+
   }
 }
 
@@ -136,14 +141,16 @@ export default {
           <RouterLink class="item" to="/settings/profile">Mon Profil</RouterLink>
           <RouterLink class="item" to="/settings/activity">Activités</RouterLink>
           <RouterLink class="item" to="/settings/project">Projets</RouterLink>
-          <RouterLink class="item" @click="logout" to="/auth/login">Déconnexion</RouterLink>
+          <p class="item" @click="logout">Déconnexion</p>
         </template>
       </SideBarComponent>
     </nav>
-    <RouterLink active-class="" class="profile" to="/settings/profile">
+    <div class="profile">
+    <RouterLink class="profile_link" active-class=""  to="/settings/profile">
       <div>{{ user }}</div>
       <img src="/icons/user.svg" alt="user icon">
     </RouterLink>
+    </div>
   </header>
 
   <div class="infos" v-if="connected">
@@ -203,6 +210,7 @@ a {
 }
 
 .item {
+  margin : 0;
   height: 15vh;
   width: 100%;
 
@@ -230,6 +238,12 @@ a {
   gap: .5em;
   align-items: center;
   justify-content: flex-end;
+  &_link {
+    width: fit-content;
+    display: flex;
+    gap: .5em;
+    align-items: center;
+  }
 
   img {
     height: 1.5em;

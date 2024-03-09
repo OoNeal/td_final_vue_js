@@ -42,7 +42,7 @@ export default {
     <img v-position="position" src="/icons/light-arrow.svg" alt="arrow">
   </div>
   <transition :name="position">
-    <section v-position="position" class="sidenav" :class="{visible: visible}">
+    <section v-position="position" v-if="visible" class="sidenav" :class="{visible: visible}">
       <div class="top">
         <img src="/icons/crossOrange.svg" alt="cross icon" @click="toggle">
         <div class="button">

@@ -1,6 +1,9 @@
 <script>
 import { useAuthStore } from '@/stores/Auth.js'
 import { mapActions, mapState } from 'pinia'
+import { toast } from 'vue3-toastify'
+import ToastOptions from '../../../toasts/toastOptions.js'
+import { useUserProfileStore } from '@/stores/UserProfile.js'
 
 export default {
   computed: {
@@ -13,22 +16,22 @@ export default {
       name: '',
       firstname: '',
       email: '',
-      errors: []
     }
   },
   methods: {
     //Les actions du stores sont accessibles dans les methods
     ...mapActions(useAuthStore, ['setApiKey']),
+    ...mapActions(useUserProfileStore, ['setName']),
     register() {
-      this.errors = []
       this.$api.post('apikeys', {
         name: `${this.firstname} ${this.name}`,
         email: this.email
       }).then((resp) => {
-        this.setApiKey(resp.data.key)
-        this.$router.push(this.returnUrl || '/')
+        this.setName(`${this.firstname} ${this.name}`)
+        this.setApiKey(resp.data.key)Update
+        this.$router.push('/')
       }).catch((err) => {
-        this.errors.push(err.response.data.errors[0])
+        toast.error(err.response.data.errors[0], ToastOptions);
       })
     }
   }

@@ -4,6 +4,7 @@ import {toast} from "vue3-toastify";
 import ToastOptions from "../../toasts/toastOptions.js";
 
 export default {
+  emits: ['update-view'],
   components: {
     PopUp
   },
@@ -50,7 +51,7 @@ export default {
 
     editEnabling() {
       this.$api.patch(`${this.isProject ? 'projects' : 'activities'}/${this.item.id}/${this.isEnabled ? 'enable' : 'disable'}`).then(() => {
-        toast.success(`${this.item.name} mis à jour`, ToastOptions);
+        toast.success(`'${this.item.name}' mis à jour`, ToastOptions);
         this.$emit('update-view')
       }).catch((err) => {
         toast.error(`${err.response.data.errors} !`, ToastOptions);
@@ -59,7 +60,7 @@ export default {
     saveItem() {
       this.toggleEditing()
       this.$api.put(`${this.isProject ? 'projects' : 'activities'}/${this.item.id}`, this.editItem).then(() => {
-        toast.success(`${this.item.name} mis à jour`, ToastOptions);
+        toast.success(`'${this.item.name}' mis à jour`, ToastOptions);
         this.$emit('update-view')
       }).catch((err) => {
         toast.error(`${err.response.data.errors} !`, ToastOptions);
@@ -70,13 +71,13 @@ export default {
     is_enabled: {
       mounted(el, binding) {
         binding.value === 1 || binding.value === true ?
-          el.style.backgroundColor = '#ECBA07'
-          : el.style.backgroundColor = '#212121'
+            el.style.backgroundColor = '#ECBA07'
+            : el.style.backgroundColor = '#212121'
       },
       updated(el, binding) {
         binding.value === 1 || binding.value === true ?
-          el.style.backgroundColor = '#ECBA07'
-          : el.style.backgroundColor = '#212121'
+            el.style.backgroundColor = '#ECBA07'
+            : el.style.backgroundColor = '#212121'
       }
     }
   }
@@ -85,7 +86,7 @@ export default {
 
 <template>
   <div class="item">
-    <div class="item_checkbox" v-is_enabled="item.is_enabled" @click="toggleEnabled" />
+    <div class="item_checkbox" v-is_enabled="item.is_enabled" @click="toggleEnabled"/>
     <div class="item_content">
       <h2>{{ item.name }}</h2>
       <p v-if="isProject">{{ item.description }}</p>
@@ -105,7 +106,7 @@ export default {
           </div>
           <div v-if="isProject" class="label">
             <label for="description">Description</label>
-            <textarea name="description" v-model="editItem.description" />
+            <textarea name="description" v-model="editItem.description"/>
           </div>
           <div v-else class="label color">
             <label for="color">Couleur associée :</label>

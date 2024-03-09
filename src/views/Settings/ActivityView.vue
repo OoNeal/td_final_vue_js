@@ -1,10 +1,10 @@
 <script>
 
-import { defineComponent } from 'vue'
+import {defineComponent} from 'vue'
 import ListItem from '@/components/ListItemComponent.vue'
 
 export default defineComponent({
-  components: { ListItem },
+  components: {ListItem},
   methods: {
     getActivities() {
       this.$api.get('activities').then((resp) => {
@@ -14,9 +14,8 @@ export default defineComponent({
       })
     },
     getFilteredActivities() {
-      this.$api.get('activities', { params: { keywords: this.keywords } }).then((resp) => {
+      this.$api.get('activities', {params: {keywords: this.keywords}}).then((resp) => {
         this.activities = resp.data
-        console.log(this.activities)
       }).catch((err) => {
         console.log(err)
       })
@@ -38,7 +37,7 @@ export default defineComponent({
   <div class="activity">
     <div class="activity_header">
       <h1>Mes activités</h1>
-      <hr />
+      <hr/>
     </div>
     <div class="activity_filter">
       <input type="text" v-model="keywords" placeholder="Filtrer">
@@ -46,7 +45,10 @@ export default defineComponent({
       <button @click="getActivities">Réinitialiser</button>
     </div>
     <div class="activity_container">
-      <ListItem @update-view="getActivities" :item="activity" v-for="activity in activities" :key="activity.id" />
+      <transition-group name="fade">
+        <list-item @update-view="getActivities" :item="activity"
+                   v-for="activity in activities" :key="activity.id"/>
+      </transition-group>
     </div>
   </div>
 </template>

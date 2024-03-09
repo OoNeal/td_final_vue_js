@@ -1,10 +1,10 @@
 <script>
 
-import { defineComponent } from 'vue'
+import {defineComponent} from 'vue'
 import ListItem from '@/components/ListItemComponent.vue'
 
 export default defineComponent({
-  components: { ListItem },
+  components: {ListItem},
   methods: {
     getProjects() {
       this.$api.get('projects').then((resp) => {
@@ -14,7 +14,7 @@ export default defineComponent({
       })
     },
     getFilteredProjects() {
-      this.$api.get('projects', { params: { keywords: this.keywords } }).then((resp) => {
+      this.$api.get('projects', {params: {keywords: this.keywords}}).then((resp) => {
         this.projects = resp.data
         console.log(this.projects)
       }).catch((err) => {
@@ -38,7 +38,7 @@ export default defineComponent({
   <div class="project">
     <div class="project_header">
       <h1>Mes projets</h1>
-      <hr />
+      <hr/>
     </div>
     <div class="project_filter">
       <input type="text" v-model="keywords" placeholder="Filtrer">
@@ -46,8 +46,10 @@ export default defineComponent({
       <button @click="getProjects">Réinitialiser</button>
     </div>
     <div class="project_container">
-      <ListItem :is-project="true" @update-view="getProjects" :item="project" v-for="project in projects"
-                :key="project.id" />
+      <transition-group name="fade">
+        <list-item :is-project="true" @update-view="getProjects" :item="project" v-for="project in projects"
+                   :key="project.id"/>
+      </transition-group>
     </div>
   </div>
 </template>

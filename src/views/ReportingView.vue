@@ -281,7 +281,7 @@ export default {
       <div class="infos time-entries">
         <div class="title">Liste des {{ this.displayedTimeEntries.length }} entrées : </div>
         <div class="entries">
-          <TimeEntry :entry="timeEntry" v-for="timeEntry in sortTimesEntries()" :key="timeEntry.id"/>
+          <TimeEntry @update-entries="updateView" :entry="timeEntry" v-for="timeEntry in sortTimesEntries()" :key="timeEntry.id"/>
         </div>
       </div>
     </div>

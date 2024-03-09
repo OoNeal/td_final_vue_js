@@ -7,7 +7,6 @@ import { useUserProfileStore } from '@/stores/UserProfile.js'
 
 export default {
   computed: {
-    //Les variables du stores sont accessibles dans les computed
     ...mapState(useAuthStore, ['apiKey']),
     ...mapState(useAuthStore, ['returnUrl'])
   },
@@ -19,7 +18,6 @@ export default {
     }
   },
   methods: {
-    //Les actions du stores sont accessibles dans les methods
     ...mapActions(useAuthStore, ['setApiKey']),
     ...mapActions(useUserProfileStore, ['setName']),
     register() {
@@ -28,8 +26,8 @@ export default {
         email: this.email
       }).then((resp) => {
         this.setName(`${this.firstname} ${this.name}`)
-        this.setApiKey(resp.data.key)Update
-        this.$router.push('/')
+        this.setApiKey(resp.data.key);
+        location.reload()
       }).catch((err) => {
         toast.error(err.response.data.errors[0], ToastOptions);
       })

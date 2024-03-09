@@ -16,19 +16,18 @@ export default {
     }
   },
   methods: {
+    useAuthStore,
     ...mapActions(useAuthStore, ['setApiKey']),
     ...mapActions(useUserProfileStore, ['setName']),
     login() {
-      this.setApiKey(this.userKey)
-      console.log('apiKey', this.apiKey)
       this.$api.get('profile', {
         headers: {
           'Authorization': `key=${this.userKey}`
         }
       }).then((resp) => {
-        console.log('resp', resp.data.name)
         this.setName(resp.data.name)
-        this.$router.push('/')
+        location.reload()
+        this.setApiKey(this.userKey)
       }).catch((err) => {
         console.log(err)
         toast.error('La clé d\'api est incorrecte', ToastOptions)

@@ -10,11 +10,16 @@ export default {
     RouterView,
     Navigation
   },
+  data() {
+    return {
+      apiKey: this.$api.defaults.headers['Authorization']
+    }
+  },
 }
 </script>
 
 <template>
-  <Navigation v-if="useAuthStore().apiKey" connected/>
+  <Navigation v-if="apiKey !== 'key=null' " connected/>
   <Navigation v-else/>
   <RouterView />
 </template>

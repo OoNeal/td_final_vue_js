@@ -21,7 +21,7 @@ export default {
     toggle() {
       this.visible = !this.visible
     }
-  }
+  },
 }
 </script>
 
@@ -29,11 +29,11 @@ export default {
   <div class="link" v-if="inHeader" @click="toggle" :class="{link_active : visible}">
     <slot name="link"></slot>
   </div>
-  <div v-else @click="toggle" class="mini-nav" :class="{visible : !visible}">
+  <div v-else @click="toggle" class="mini-nav" :class="[{visible : !visible}, position]">
     <div class="button">
       <slot name="button"></slot>
     </div>
-    <img src="/icons/light-arrow.svg" alt="arrow">
+    <img :class="position" src="/icons/light-arrow.svg" alt="arrow">
   </div>
   <transition :name="position">
     <section v-if="visible" class="sidenav" :class="position">

@@ -231,6 +231,8 @@ export default {
         }).catch((err) => {
           toast.error(`${err.response.data.errors[0]} !</br>${err.response.data.errors[1]} !`, ToastOptions);
         })
+      } else {
+        toast.error(`Sélectionne un projet et une activité !`, ToastOptions);
       }
     },
     deleteFilters() {
@@ -556,7 +558,6 @@ select {
 }
 
 .activities, .objectives {
-  //Engueule moi Elian regarde comment tu vas détester comment g fait <3
   display: flex;
   flex-direction: column;
   gap: 1em;

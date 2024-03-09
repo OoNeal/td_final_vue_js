@@ -237,14 +237,14 @@ export default {
       <h1>
         Statistiques du
         <DatePicker class="datepicker-size" v-model="startDate" :enable-time-picker="false"
-                    :highlight="intervalDates()" :max-date="new Date()" prevent-min-max-navigation auto-apply>
+                    :highlight="intervalDates()" :max-date="new Date()" dark prevent-min-max-navigation auto-apply>
           <template #trigger>
             <span class="clickable-text">{{ checkDates(startDate) }}</span>
           </template>
         </DatePicker>
         au
         <DatePicker class="datepicker-size" v-model="endDate" :enable-time-picker="false"
-                    :highlight="intervalDates()" :max-date="new Date()" prevent-min-max-navigation auto-apply>
+                    :highlight="intervalDates()" :max-date="new Date()" dark prevent-min-max-navigation auto-apply>
           <template #trigger>
             <span class="clickable-text">{{ checkDates(endDate) }}</span>
           </template>

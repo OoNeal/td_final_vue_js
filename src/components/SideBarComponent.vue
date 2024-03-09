@@ -46,7 +46,7 @@ export default {
       <div v-if="inHeader"  class="sidenav-content" @click="toggle">
         <slot name="content"></slot>
       </div>
-      <div class="sidenav-content">
+      <div v-else class="sidenav-content">
         <slot name="content"></slot>
       </div>
     </section>
